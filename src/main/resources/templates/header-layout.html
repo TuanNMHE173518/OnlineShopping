@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html class="no-js" lang="zxx" xmlns:th="http://www.thymeleaf.org"
+
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <title>Layout</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.svg" />
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/LineIcons.3.0.css" />
+    <link rel="stylesheet" href="/css/tiny-slider.css" />
+    <link rel="stylesheet" href="/css/glightbox.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="webjars/font-awesome/6.5.1/css/all.min.css"/>
+    <style>
+        .nav-item a.active {
+            color: blue; /* Màu sắc của nút active */
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<header th:fragment="header" class="header navbar-area">
+
+    <!-- Start Topbar -->
+    <div class="topbar">
+        <div class="container">
+            <div class="row align-items-center" style="
+                        border-right-width: 0px;
+                        margin-left: 150px">
+                <div class="col-lg-9 col-md-9 col-12">
+                    <div class="top-middle">
+                        <ul class="useful-links">
+                            <li><a th:href="@{/home}">Home</a></li>
+                            <li><a th:href="@{/about-us}">About Us</a></li>
+                            <li><a th:href="@{/contact}">Contact Us</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-12">
+                    <div class="top-end">
+
+                        <div class="user parent" sec:authorize="isAuthenticated()">
+                            <i class="lni lni-user" th:href="@{/profile}">
+                                <span th:text="${#authentication.principal.username}"></span>
+                            </i>
+                            <ul class="sub-menu child" id="submenu-1-9">
+                                <li class="nav-item"><a th:href="@{/profile}">Thông Tin Tài Khoản</a></li>
+                                <li class="nav-item"><a th:href="@{/profile/edit}">Thay Đổi Hồ Sơ</a></li>
+                                <li class="nav-item"><a th:href="@{/profile/changePassword}">Đổi Mật Khẩu</a></li>
+                                <li class="nav-item" sec:authorize="hasAuthority('SELF_ORDER_PERMISSION')"  ><a th:href="@{/profile/order}">Đơn hàng</a></li>
+                                <li class="nav-item" sec:authorize="hasAuthority('MANAGE_PERMISSION')"  ><a th:href="@{/viewdashboard}">Trang quản trị</a></li>
+                                <li class="nav-item"><a th:href="@{/logout}">Đăng Xuất</a></li>
+                            </ul>
+                        </div>
+
+                        <ul class="user-login">
+
+                            <li sec:authorize="isAnonymous()">
+                                <a th:href="@{/login}">Sign In</a>
+                            </li>
+
+                            <li sec:authorize="isAnonymous()">
+                                <a th:href="@{/register}">Register</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Topbar -->
+    <!-- Start Header Middle -->
+    <div class="header-middle">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-3 col-md-3 col-7">
+                    <!-- Start Header Logo -->
+                    <a class="navbar-brand" th:href="@{/home}">
+                        <img src="/images/logo/logo2.jpg" alt="Logo">
+                    </a>
+                    <!-- End Header Logo -->
+                </div>
+                <div class="col-lg-5 col-md-7 d-xs-none">
+                    <!-- Start Main Menu Search -->
+                    <form action="/home/search">
+                        <div class="main-menu-search">
+                            <!-- navbar search start -->
+                            <div class="navbar-search search-style-5">
+                                <div class="search-input">
+                                    <input th:value="${deviceName}" name="deviceName" type="text" placeholder="Bạn đang tìm sản phẩm,tin tức...">
+                                </div>
+                                <div class="search-btn">
+                                    <button type="submit"><i class="lni lni-search-alt"></i></button>
+                                </div>
+                            </div>
+                            <!-- navbar search Ends -->
+                        </div>
+                    </form>
+                    <!-- End Main Menu Search -->
+                </div>
+                <div class="col-lg-4 col-md-2 col-5">
+                    <div class="middle-right-area">
+                        <div class="nav-hotline">
+                            <i class="lni lni-phone"></i>
+                            <h3>Hotline:
+                                <span>(+100) 123 456 7890</span>
+                            </h3>
+                        </div>
+                        <div class="navbar-cart">
+                            <div class="wishlist">
+                                <a href="javascript:void(0)">
+                                    <i class="lni lni-heart"></i>
+                                    <span class="total-items">0</span>
+                                </a>
+                            </div>
+                            <div class="cart-items">
+                                <a href="javascript:void(0)" class="main-btn">
+                                    <i class="lni lni-cart"></i>
+                                    <span class="total-items" th:text="${cartCount}"></span>
+                                </a>
+                                <!-- Shopping Item -->
+                                <div class="shopping-item">
+                                    <div class="dropdown-cart-header">
+                                        <span th:text="${cartCount} + 'Item'"></span>
+                                        <a th:href="@{/cart}">View Cart</a>
+                                    </div>
+                                    <ul class="shopping-list" th:each="cart : ${carts}">
+                                        <li th:if="${cart.productType == 'DEVICE'}">
+                                            <a href="javascript:void(0)" class="remove" title="Remove this item"><i class="lni lni-close"></i></a>
+                                            <div class="cart-img-head">
+                                                <a class="cart-img" th:href="@{'/deviceDetail/' + ${cart.deviceId}}">
+                                                    <img th:src="@{${cart.productImage}}" th:alt="${cart.productName}" alt="">
+                                                </a>
+                                            </div>
+                                            <div class="content">
+                                                <h4>
+                                                    <a th:href="@{'/deviceDetail/' + ${cart.deviceId}}" th:text="${cart.productName}"></a>
+                                                </h4>
+                                                <p>
+                                                    <span class="quantity" th:text="${cart.quantity} + 'x'"></span>
+                                                    <span class="amount" th:text="${#numbers.formatDecimal(cart.productPrice, 0, 'COMMA', 2, 'POINT')}"></span>
+                                                    <span class="discount-price-device" th:if="${cart.salePriceDiscount != null}" th:text="${cart.salePriceDiscount + '%'}" style="display: none;"></span>
+                                                </p>
+                                            </div>
+                                        </li>
+                                        <li th:if="${cart.productType == 'ACCESSORY'}">
+                                            <a href="javascript:void(0)" class="remove" title="Remove this item"><i class="lni lni-close"></i></a>
+                                            <div class="cart-img-head">
+                                                <a class="cart-img" th:href="@{'/accessoryDetail/' + ${cart.accessoryId}}">
+                                                    <img th:src="@{${cart.productImage}}" th:alt="${cart.productName}" alt="">
+                                                </a>
+                                            </div>
+                                            <div class="content">
+                                                <h4>
+                                                    <a th:href="@{'/accessoryDetail/' + ${cart.accessoryId}}" th:text="${cart.productName}"></a>
+                                                </h4>
+                                                <p>
+                                                    <span class="quantity" th:text="${cart.quantity} + 'x'"></span>
+                                                    <span class="amount" th:text="${#numbers.formatDecimal(cart.productPrice, 0, 'COMMA', 2, 'POINT')}"></span>
+                                                    <span class="discount-price-accessory" th:if="${cart.salePriceDiscount != null}" th:text="${cart.salePriceDiscount + '%'}" style="display: none;"></span>
+                                                </p>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                    <div class="bottom">
+                                        <div class="total">
+                                            <span>Total</span>
+                                            <span class="total-amount"></span> <!-- Sẽ được cập nhật bằng JavaScript -->
+                                        </div>
+                                        <div class="button">
+                                            <a th:href="@{/checkout}" class="btn animate">Checkout</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--/ End Shopping Item -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Header Middle -->
+    <!-- Start Header Bottom -->
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8 col-md-8 col-12">
+                <div class="nav-inner" style="margin-left: 70px">
+                    <!-- Start Navbar -->
+                    <nav class="navbar navbar-expand-lg">
+                        <button class="navbar-toggler mobile-menu-btn" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                                aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="toggler-icon"></span>
+                            <span class="toggler-icon"></span>
+                            <span class="toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse sub-menu-bar" id="navbarSupportedContent">
+                            <ul id="nav" class="navbar-nav ms-auto">
+                                <li class="nav-item " th:each="device : ${typeDevices}" >
+                                    <a  th:href="@{/devices/{id}(id=${device.id})}" th:text="${device.name}"
+                                        th:classappend="${id == device.id } ? 'active' : ''">
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a th:href="@{/accessory}">Phụ kiện</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a  th:href="@{/product-grids}">Tin tức</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a th:href="@{/product-sale}">Khuyến mãi</a>
+                                </li>
+                            </ul>
+                        </div> <!-- navbar collapse -->
+                    </nav>
+                    <!-- End Navbar -->
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-12">
+                <!-- Start Nav Social -->
+                <div class="nav-social">
+                    <h5 class="title">Follow Us:</h5>
+                    <ul>
+                        <li>
+                            <a href="javascript:void(0)"><i class="lni lni-facebook-filled"></i></a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)"><i class="lni lni-twitter-original"></i></a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)"><i class="lni lni-instagram"></i></a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)"><i class="lni lni-skype"></i></a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- End Nav Social -->
+            </div>
+        </div>
+    </div>
+    <!-- End Header Bottom -->
+</header>
+
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/tiny-slider.js"></script>
+<script src="/js/glightbox.min.js"></script>
+<script src="/js/main.js"></script>
+
+<script th:src="@{/js/header.js}"></script>
+
+</body>
+</html>

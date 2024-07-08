@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <!-- Main CSS-->
+    <link rel="stylesheet" type="text/css" href="/css/mainSA.css"/>
+    <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css"
+    />
+    <!-- or -->
+    <link
+            rel="stylesheet"
+            href="https://unpkg.com/boxicons@latest/css/boxicons.min.css"
+    />
+    <!-- Font-icon css-->
+    <link
+            rel="stylesheet"
+            type="text/css"
+            href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <link
+            rel="stylesheet"
+            href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+    />
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css"
+    />
+</head>
+<body>
+<header th:fragment="navbar-admin" class="app-header">
+    <!-- Sidebar toggle button--><a
+        class="app-sidebar__toggle"
+        href="#"
+        data-toggle="sidebar"
+        aria-label="Hide Sidebar"
+></a>
+    <!-- Navbar Right Menu-->
+    <ul class="app-nav">
+        <!-- User Menu-->
+        <li>
+            <a class="app-nav__item" href="/logout">
+                <i class="bx bx-log-out bx-rotate-180"></i>
+                <i>Đăng xuất</i>
+            </a>
+        </li>
+    </ul>
+
+    <!-- Sidebar menu-->
+    <div class="app-sidebar__overlay" data-toggle="sidebar"></div>
+    <aside class="app-sidebar">
+        <div class="app-sidebar__user">
+            <a href="/profile">
+                <img
+                        class="app-sidebar__user-avatar"
+                        src="https://1000logos.net/wp-content/uploads/2016/10/Apple-Logo.jpg"
+                        width="50px"
+                        alt="User Image"
+                />
+            </a>
+            <div>
+                <p class="app-sidebar__user-name"><b>Admin</b></p>
+                <p class="app-sidebar__user-designation">Chào mừng bạn trở lại</p>
+            </div>
+        </div>
+        <hr/>
+        <ul class="app-menu">
+            <li sec:authorize="hasAuthority('MANAGE_PERMISSION') ||hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')">
+                <a id="dashboard" class="app-menu__item " href="/dashboard"
+                ><i class="app-menu__icon bx bx-tachometer"></i
+                ><span class="app-menu__label">Bảng điều khiển</span></a
+                >
+            </li>
+            <li sec:authorize="hasAuthority('ACCOUNT_PERMISSION') || hasRole('ROLE_ADMIN')">
+                <a id="staff" class="app-menu__item" href="/admin/manage-account"
+                ><i class="app-menu__icon bx bxs-user-account"></i>
+                    <span class="app-menu__label">Quản lý người dùng</span></a
+                >
+            </li>
+
+            <li sec:authorize="hasAuthority('ACCOUNT_PERMISSION') || hasRole('ROLE_ADMIN')">
+                <a id="role_permission" class="app-menu__item " href="/admin/manage-role" >
+                    <i class="app-menu__icon bx bx bx-lock"></i>
+                    <span class="app-menu__label">Quản lý quyền hạn</span>
+                </a>
+            </li>
+            <li sec:authorize="hasAuthority('MANAGE_DEVICE_PERMISSION') || hasRole('ROLE_STAFF')">
+                <a id="product" class="app-menu__item " href="" style="pointer-events: none">
+                    <i class="app-menu__icon bx bx-purchase-tag-alt"></i>
+                    <span class="app-menu__label">Quản lý sản phẩm</span>
+                </a>
+                <ul class="option">
+                    <li><a id="device" class="app-menu__item " href="/manage-device/listDevice"
+                    ><i class="app-menu__icon bx bxs-devices"></i
+                    ><span class="app-menu__label">Thiết bị</span></a></li>
+                    <li><a id="acc" class="app-menu__item " href="/manage-accessory/listAccessory"
+                    ><i class="app-menu__icon bx bx-headphone"></i
+                    ><span class="app-menu__label">Phụ kiện</span></a></li>
+                </ul>
+            </li>
+            <li sec:authorize="hasRole('ROLE_STAFF')">
+                <a id="order" class="app-menu__item " href="/manage-order/listOrder"
+                ><i class="app-menu__icon bx bx-task"></i
+                ><span class="app-menu__label">Quản lý đơn hàng</span></a
+                >
+            </li>
+            <li sec:authorize="hasAuthority('MANAGE_SALE') || hasRole('ROLE_STAFF')">
+                <a id="sale" class="app-menu__item " href="/manage-sale/listSale"
+                ><i class="app-menu__icon bx bxs-discount"></i
+                ><span class="app-menu__label">Quản lý giảm giá</span></a
+                >
+            </li>
+            <li sec:authorize="hasAuthority('MANAGE_NEWS_PERMISSION') || hasRole('ROLE_STAFF')">
+                <a id="news" class="app-menu__item " href="/manage-news"
+                ><i class="app-menu__icon bx bx-news"></i
+                ><span class="app-menu__label">Quản lý tin tức</span></a
+                >
+            </li>
+<!--            <li sec:authorize="hasRole('ROLE_STAFF')">-->
+<!--                <a id="report" class="app-menu__item " href="/manage-order/listOrder"-->
+<!--                ><i class="app-menu__icon bx bx-pie-chart-alt-2"></i-->
+<!--                ><span class="app-menu__label">Báo cáo doanh thu</span></a-->
+<!--                >-->
+<!--            </li>-->
+        </ul>
+    </aside>
+</header>
+
+
+</body>
+</html>

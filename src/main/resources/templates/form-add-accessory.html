@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Thêm phụ kiện | Quản trị Admin</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Main CSS-->
+    <link rel="stylesheet" type="text/css" href="/css/mainSA.css">
+    <!-- Font-icon css-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+    <!-- or -->
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@latest/css/boxicons.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script type="text/javascript" src="/ckeditor/ckeditor.js"></script>
+    <script src="http://code.jquery.com/jquery.min.js" type="text/javascript"></script>
+</head>
+
+<body onload="time()" class="app sidebar-mini rtl">
+<style>
+    .Choicefile {
+        display: block;
+        background: #14142B;
+        border: 1px solid #fff;
+        color: #fff;
+        width: 150px;
+        text-align: center;
+        text-decoration: none;
+        cursor: pointer;
+        padding: 5px 0px;
+        border-radius: 5px;
+        font-weight: 500;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .Choicefile:hover {
+        text-decoration: none;
+        color: white;
+    }
+
+    #uploadfile,
+    .removeimg {
+        display: none;
+    }
+
+    #thumbbox {
+        position: relative;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .removeimg {
+        height: 25px;
+        position: absolute;
+        background-repeat: no-repeat;
+        top: 5px;
+        left: 5px;
+        background-size: 25px;
+        width: 25px;
+        /* border: 3px solid red; */
+        border-radius: 50%;
+
+    }
+
+    .removeimg::before {
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        content: '';
+        border: 1px solid red;
+        background: red;
+        text-align: center;
+        display: block;
+        margin-top: 11px;
+        transform: rotate(45deg);
+    }
+
+    .removeimg::after {
+        /* color: #FFF; */
+        /* background-color: #DC403B; */
+        content: '';
+        background: red;
+        border: 1px solid red;
+        text-align: center;
+        display: block;
+        transform: rotate(-45deg);
+        margin-top: -2px;
+    }
+</style>
+<!-- Navbar-->
+<div th:replace="~{navbar-layout :: navbar-admin}"></div>
+<main class="app-content">
+    <div class="app-title">
+        <ul class="app-breadcrumb breadcrumb">
+            <li class="breadcrumb-item">Thêm phụ kiện</li>
+            <li class="breadcrumb-item">Thêm cập phụ kiện</li>
+        </ul>
+        <div id="clock"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tile">
+                <h3 class="tile-title" th:if="${accessory.id == 0}">Tạo phụ kiện mới</h3>
+                <h3 class="tile-title" th:if="${accessory.id!= 0}">Cập phụ kiện bị</h3>
+                <div class="tile-body">
+                    <form action="/manage-accessory/save" id="myForm" method="post" enctype="multipart/form-data" th:object="${accessory}">
+                        <div class="row">
+                            <div class="form-group col-md-3">
+                                <label class="control-label">Tên phụ kiện </label>
+                                <input class="form-control" id="accessory-name" oninput="checkName(this)" type="text" name="name" th:value="*{name}" required>
+                                <p id="messName" class="text-danger"></p>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label class="control-label">Giá tiền</label>
+                                <input class="form-control" type="number" name="price" th:value="*{price}" onchange="validateInput(this)" required>
+                                <p id="messPrice" class="text-danger"></p>
+                            </div>
+
+                            <div class="form-group col-md-3">
+                                <label for="exampleSelect3" class="control-label">Danh mục phụ kiện</label>
+                                <select class="form-control" id="exampleSelect3" name="accessoryCategory">
+                                    <option th:each="accessoryCat : ${accessoryCategories}"
+                                            th:value="${accessoryCat.id}"
+                                            th:text="${accessoryCat.name}"
+                                            th:if="${accessory.id != 0}"
+                                            th:selected="${accessory.accessoryCategory.id == accessoryCat.id}"
+                                    ></option>
+                                    <option th:each="accessoryCat : ${accessoryCategories}"
+                                            th:value="${accessoryCat.id}"
+                                            th:text="${accessoryCat.name}"
+                                            th:if="${accessory.id == 0}"
+                                    ></option>
+                                </select>
+                            </div>
+
+                            <div class="form-group col-md-3 ">
+                                <label for="exampleSelect1" class="control-label">Giảm giá</label>
+                                <select class="form-control" id="exampleSelect1" name="sale">
+                                    <option th:selected="${accessory.sale == null}" value="">Không có</option>
+                                    <option th:each="sa : ${saleList}" th:value="${sa.id}"
+                                            th:text="${sa.name}"
+                                            th:if="${accessory.sale == null}"
+                                    ></option>
+                                    <option th:each="sa : ${saleList}" th:value="${sa.id}"
+                                            th:text="${sa.name}"
+                                            th:if="${accessory.sale != null}"
+                                            th:selected="${accessory.sale.id == sa.id}"
+                                    ></option>
+                                </select>
+                            </div>
+
+                            <div class="form-group col-md-3">
+                                <label  class="control-label">Sản phẩm tương thích</label>
+                                <div id="typeDeviceContainer" th:each="typeDevice : ${typeDeviceList}">
+                                    <input class="typeDevCheckbox" th:id="'typeDev' + ${typeDevice.id}" name="typeDeviceIdList" type="checkbox" th:value="${typeDevice.id}" th:text="${typeDevice.name}"
+                                           th:checked="${accessory.typeDevices.contains(typeDevice)}" >
+                                </div>
+                                <p id="error-message" class="text-danger" style="display: none;">Vui lòng chọn ít nhất một sản phẩm tương thích</p>
+                            </div>
+
+                            <div class="form-group col-md-2">
+                                <label class="control-label">Loại màu sắc</label>
+                                <input class="form-control" type="text" name="colorName" oninput="checkColor(this)"  th:value="*{colorName}" required>
+                                <p id="messColor" class="text-danger"></p>
+                            </div>
+
+                            <div class="form-group col-md-1">
+                                <label class="control-label">Màu sắc</label>
+                                <input class="form-control " type="color" name="color"  th:value="*{color}" required >
+
+                            </div>
+
+                            <div class="form-group col-md-3">
+                                <label class="control-label">Số lượng</label>
+                                <input class="form-control" type="number" name="quantity" th:value="*{quantity}" required onchange="validateQuantity(this)">
+                                <p id="messQuantity" class="text-danger"></p>
+                            </div>
+
+
+                            <div class="form-group  col-md-3">
+                                <label class="control-label">Chất liệu</label>
+                                <input class="form-control" type="text" name="material" th:value="*{material}">
+                            </div>
+
+                            <div class="form-group  col-md-3">
+                                <label class="control-label">Tính năng</label>
+                                <input class="form-control" type="text" name="feature" th:value="*{feature}">
+                            </div>
+
+                            <div class="form-group col-md-9">
+                                <label class="control-label">Mô tả</label>
+                                <input class="form-control" type="text" name="description" oninput="checkDes(this)" th:value="*{description}" required>
+                                <p id="messDes" class="text-danger"></p>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label class="control-label">Ảnh chính của phụ kiện</label>
+                                <div>
+                                    <input type="file" name="mainImageFile" id="mainImageInput" accept="image/*" oninput="mainIm(this)" th:required="${accessory.id == 0}"/>
+                                    <div class="preview" id="mainPreview">
+                                        <img th:src="${accessory.mainImage}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group col-md-12">
+                                <label class="control-label">Ảnh phụ</label>
+                                <div>
+                                    <input type="file" name="extraImages" id="imageInput" multiple accept="image/*" oninput="extraIm(this)" th:required="${accessory.id == 0}"/>
+                                    <div class="preview" id="preview">
+                                        <img th:each="accImage : ${accessory.accessoryImages}" th:src="${accImage.image}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" th:if="*{id != 0}" name="id" th:value="*{id}">
+                        <button class="btn btn-save" type="submit">Lưu lại</button>
+                        <a class="btn btn-cancel" href="/manage-accessory/listAccessory">Hủy bỏ</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="/js/jquery-3.2.1.min.js"></script>
+<script src="/js/popper.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/mainSA.js"></script>
+<script src="/js/plugins/pace.min.js"></script>
+<script>
+    function checkName(nameInput) {
+        var resultElement = document.getElementById('messName');
+        resultElement.textContent = "";
+        var name = nameInput.value;
+        var specialCharRegex = /[!@#$%^&*(),.?":{}|<>~`/_+=\-[\]\\]/;
+
+        if (name.length < 5 || name.length > 50 || specialCharRegex.test(name) || name.includes(".")) {
+            resultElement.textContent = "Vui lòng nhập tên phụ kiện lớn hơn hoặc bằng 5 kí tự, nhỏ hơn hoặc bằng 50 kí tự, không chứa kí tự đặc biệt";
+            resultElement.style.color = "red";
+        }
+    }
+
+    function checkDes(nameInput) {
+        var resultElement = document.getElementById('messDes');
+        resultElement.textContent = "";
+        var name = nameInput.value;
+
+        if (name.length < 10) {
+            resultElement.textContent = "Vui lòng nhập mô tả lớn hơn hoặc bằng 10 kí tự";
+            resultElement.style.color = "red";
+        }
+    }
+
+    function checkColor(nameInput) {
+        var resultElement = document.getElementById('messColor');
+        resultElement.textContent = "";
+        var name = nameInput.value;
+        var specialCharRegex = /[!@#$%^&*(),.?":{}|<>~`/_+=\-[\]\\]/;
+
+        if (name.length < 2 || name.length > 30 || specialCharRegex.test(name)) {
+            resultElement.textContent = "Vui lòng nhập màu sắc lớn hơn hoặc bằng 2 kí tự, nhỏ hơn hoặc bằng 30 kí tự và không chứa kí tự đặc biệt!";
+            resultElement.style.color = "red";
+        }
+    }
+
+    function validateInput(input) {
+        var resultElement = document.getElementById('messPrice');
+        resultElement.textContent = "";
+        var value = input.value;
+
+        if (value <= 0) {
+            resultElement.textContent = "Giá tiền phải lớn hơn 0";
+            resultElement.style.color = "red";
+        }
+    }
+
+    function validateQuantity(input) {
+        var resultElement = document.getElementById('messQuantity');
+        resultElement.textContent = "";
+        var value = input.value;
+
+        if (value <= 0) {
+            resultElement.textContent = "Số lượng phải lớn hơn 0";
+            resultElement.style.color = "red";
+        }
+    }
+
+    var form = document.getElementById('myForm');
+    form.addEventListener('submit', function(event) {
+        checkForm(event);
+    });
+
+    function checkForm(event) {
+        var isValid = true;
+
+        checkName(document.getElementById('accessory-name'));
+        checkDes(document.querySelector('input[name="description"]'));
+        checkColor(document.querySelector('input[name="colorName"]'));
+        validateInput(document.querySelector('input[name="price"]'));
+        validateQuantity(document.querySelector('input[name="quantity"]'));
+
+        var nameError = document.getElementById('messName').textContent;
+        var desError = document.getElementById('messDes').textContent;
+        var colorError = document.getElementById('messColor').textContent;
+        var priceError = document.getElementById('messPrice').textContent;
+        var quantityError = document.getElementById('messQuantity').textContent;
+
+        if (nameError || desError || colorError || priceError || quantityError) {
+            isValid = false;
+        }
+
+        var checkboxes = document.getElementsByClassName('typeDevCheckbox');
+        var errorMessage = document.getElementById('error-message');
+        var isChecked = false;
+
+        for (var i = 0; i < checkboxes.length; i++) {
+            if (checkboxes[i].checked) {
+                isChecked = true;
+                break;
+            }
+        }
+
+        if (!isChecked) {
+            errorMessage.style.display = 'block';
+            isValid = false;
+        } else {
+            errorMessage.style.display = 'none';
+        }
+
+        if (!isValid) {
+            event.preventDefault();
+            swal("Lỗi", "Vui lòng điền đầy đủ thông tin và sửa các lỗi được hiển thị.", "error");
+        } else {
+            event.preventDefault();
+            swal("Thành công", "Thêm phụ kiện thành công.", "success").then((willSubmit) =>{
+                if (willSubmit){
+
+
+                }
+            })
+            // form.submit();
+        }
+    }
+</script>
+
+</body>
+</html>

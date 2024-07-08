@@ -1,0 +1,47 @@
+version: '3.8'
+services:
+  app-service:
+    container_name: itech-heaven-container
+    image: itech-heaven
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/itech_heaven
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 123
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQL8Dialect
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: "true"
+      SPRING_JPA_PROPERTIES_HIBERNATE_USE_SQL_COMMENTS: "true"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - my_network
+    volumes:
+      - static-files:/src/main/resources/static
+
+  db:
+    image: mysql:8.4.0
+    container_name: db
+    environment:
+      MYSQL_HOST: db
+      MYSQL_DATABASE: itech_heaven
+      MYSQL_ROOT_PASSWORD: 123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - my_network
+
+volumes:
+  mysql-data:
+  static-files:
+
+networks:
+  my_network:
+    driver: bridge

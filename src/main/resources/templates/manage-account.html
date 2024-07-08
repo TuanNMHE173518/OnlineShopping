@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Danh sách nhân viên | Quản trị Admin</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Main CSS-->
+    <link rel="stylesheet" type="text/css" href="/css/mainSA.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+    <!-- or -->
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@latest/css/boxicons.min.css">
+
+    <!-- Font-icon css-->
+    <link rel="stylesheet" type="text/css"
+          href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
+
+    <style>
+        .disabled-row {
+            color: #aaa;
+        }
+    </style>
+
+</head>
+
+<body onload="time()" class="app sidebar-mini rtl">
+<!-- Navbar-->
+<header th:insert="~{navbar-layout :: navbar-admin}"></header>
+<main class="app-content">
+    <div class="app-title">
+        <ul class="app-breadcrumb breadcrumb side">
+            <li class="breadcrumb-item active"><a href="#"><b>Danh sách nhân viên</b></a></li>
+        </ul>
+        <div id="clock"></div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tile">
+                <div class="tile-body">
+
+                    <div class="row element-button">
+
+                        <div class="col-sm-3">
+                            <a class="btn btn-delete btn-lg" type="button" title="Khóa" onclick="disableUserByCheckbox(this)"><i
+                                    class="fa fa-lock"></i> Khóa tài khoản </a>
+                        </div>
+                        <div class="col-sm-3">
+                            <a class="btn btn-save btn-lg" type="button" title="Kích hoạt" onclick="enableUserByCheckbox(this)"><i
+                                    class="fa fa-unlock"></i> Kích hoạt tài khoản </a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+
+                                <select id="search_role" name="search_role" class="form-control" th:onchange="searchByRole()">
+                                    <option value="0" th:selected="search_role == 0">Chọn vai trò</option>
+                                    <option th:each="r : ${roles}"
+                                            th:text="${r.name.substring(5)}"
+                                            th:value="${r.id}"
+                                            th:selected="${r.id == search_role}"
+                                    >
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="username"
+                           th:value="${#authentication.getName()}"
+                    >
+                    <form action="/admin/manage-account/disable-all" method="post" id="form-disable">
+                        <table class="table table-hover table-bordered js-copytextarea"
+                               id="sampleTable">
+                            <thead>
+                            <tr>
+                                <th><input type="checkbox" id="all" th:name="all" th:value="all"></th>
+                                <th>STT</th>
+                                <th>Tài khoản</th>
+                                <th>Email</th>
+                                <th>Họ và tên</th>
+                                <th>Địa chỉ</th>
+                                <th>Giới tính</th>
+                                <th>SĐT</th>
+                                <th>Quyền hạn</th>
+                                <th>Trạng thái</th>
+                                <th>Tính năng</th>
+
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="user,stat : ${users}" th:classappend="${!user.enabled || !user.accountNonExpired ? 'disabled-row' : ''}">
+                                <td>
+                                    <input type="checkbox" class="checkbox-user" th:data-user="${user.username}" th:name="checkbox-user" th:value="${user.id}"/>
+                                </td>
+                                <td th:text="${stat.count}"></td>
+                                <td th:text="${user.username}"></td>
+                                <td th:text="${user.email}"></td>
+                                <td th:text="${user.firstname + ' ' + user.getLastname()}"></td>
+                                <td th:text="${user.getAddress()}"></td>
+                                <td th:text="${user.isGender() ? 'Nam': 'Nữ'}"></td>
+                                <td th:text="${user.getPhone()}"></td>
+                                <td>
+                                    <ul>
+                                        <li th:each="role : ${user.getRoles()}"
+                                            th:text="${role.getName().substring(5)}"></li>
+                                    </ul>
+                                </td>
+                                <td th:text="${user.enabled || user.accountNonExpired ? 'Được kích hoạt' : 'Đã khóa'}"></td>
+
+                                <td class="table-td-center">
+
+                                    <button class="btn btn-primary btn-sm trash"
+                                            type="button"
+                                            title="Khóa"
+                                            th:data-user-id="${user.id}"
+                                            th:data-user-name="${user.username}"
+                                            onclick="disableUser(this.dataset.userId, this.dataset.userName)"><i class="fa fa-lock"></i>
+                                    </button>
+                                    <button class="btn btn-success btn-sm active"
+                                            type="button"
+                                            title="Kích hoạt"
+                                            th:data-user-id="${user.id}"
+                                            onclick="enableUser(this.dataset.userId)">
+                                        <i class="fa fa-unlock"></i>
+                                    </button>
+                                    <button class="btn btn-primary btn-sm edit"
+                                            type="button" title="Sửa"
+                                            id="show-emp"
+                                            data-toggle="modal"
+                                            data-target="#ModalUP"
+                                            th:data-user-id="${user.id}"
+                                            th:data-username="${user.username}"
+                                            th:data-fullname="${user.firstname + ' ' + user.lastname}"
+                                            th:data-email="${user.email}"
+
+                                    >
+                                        <input type="hidden" th:each="role : ${user.getRoles()}" th:id="'user_role' + ${user.id}" th:value="${role.id}">
+
+
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!--
+MODAL
+-->
+<div  class="modal fade" id="ModalUP" tabindex="-1" role="dialog" aria-hidden="true"
+     data-backdrop="static"
+     data-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <form th:action="@{/admin/manage-account/update}" method="post">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="form-group  col-md-12">
+                        <span class="thong-tin-thanh-toan">
+                            <h5>Chỉnh sửa thông tin người dùng</h5>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label class="control-label">ID</label>
+                        <input class="form-control" type="text" id="user-id" name="user-id" readonly>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label class="control-label">Họ và tên </label>
+                        <input class="form-control" type="text" value="" id="full-name" readonly>
+                    </div>
+                    <div class="form-group  col-md-6">
+                        <label class="control-label">Quyền hạn</label>
+                        <div th:each="role : ${roles}">
+                            <div class="form-check">
+                                <input  class="form-check-input role-checkbox" type="checkbox" th:value="${role.id}" name="user-role" th:id="${role.id}">
+                                <label class="form-check-label" th:for="${role.id}" th:text="${role.name.substring(5)}"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label class="control-label">Đặt lại mật khẩu</label>
+                        <button class="btn btn-warning"
+                                type="button"
+                                id="reset-password-button"
+
+                        >
+                            <i class="fas fa-key"></i> Đặt lại mật khẩu
+                        </button>
+                    </div>
+
+                </div>
+
+                <BR>
+                <button class="btn btn-save" type="submit">Lưu lại</button>
+                    <a class="btn btn-cancel" data-dismiss="modal" href="#">Hủy bỏ</a>
+                <BR>
+            </div>
+            </form>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+<!--
+MODAL
+-->
+
+<!-- Essential javascripts for application to work-->
+<script src="/js/jquery-3.2.1.min.js"></script>
+<script src="/js/popper.min.js"></script>
+<script src="/js/bootstrapSA.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="src/jquery.table2excel.js"></script>
+<script src="/js/mainSA.js"></script>
+<script src="webjars/sockjs-client/1.5.1/sockjs.min.js"></script>
+<script src="webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
+<!-- The javascript plugin to display page loading on top-->
+<script src="/js/plugins/pace.min.js"></script>
+<!-- Page specific javascripts-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+<!-- Data table plugin-->
+<script type="text/javascript" src="/js/plugins/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/js/plugins/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript">
+
+    $('#sampleTable').DataTable({
+        info: true,
+        paging: true,
+        searching: true,
+    });
+
+</script>
+<script>
+
+    function disableUser(userid, username) {
+        swal({
+            title: "Cảnh báo",
+            text: "Bạn có chắc chắn là muốn khóa tài khoản này?",
+            buttons: ["Hủy bỏ", "Đồng ý"],
+        })
+            .then((willDelete) => {
+                if (!willDelete) {
+                    return;
+                }
+                if (username === 'Admin123'){
+                    swal({
+                        title: "Cảnh báo",
+                        text: "Bạn không thể khóa tài khoản Admin123!",
+                        buttons: {
+                            close:{
+                                text: "Đóng",
+                                value: null,
+                                visible: true,
+                                className: "",
+                                closeModal: true,
+                            },
+                        },
+                    })
+                }else{
+                    if (document.getElementById('username').value === username) {
+                        swal({
+                            title: "Cảnh báo",
+                            text: "Bạn có chắc muốn khóa tài khoản của mình?",
+                            buttons: ["Hủy bỏ", "Đồng ý"],
+                        })
+                            .then((willDelete) => {
+                                if (willDelete) {
+                                    window.location.href = "/admin/manage-account/disable?userid=" + userid;
+                                }
+                            });
+                    } else {
+
+                        swal("Đã khóa thành công!").then(() => {
+                            window.location.href = "/admin/manage-account/disable?userid=" + userid;
+                        });
+                    }
+                }
+            });
+    }
+
+    function enableUser(userid) {
+        swal({
+            title: "Cảnh báo",
+            text: "Bạn có chắc chắn là muốn kích hoạt tài khoản này?",
+            buttons: ["Hủy bỏ", "Đồng ý"],
+        })
+            .then((willDelete) => {
+                if (!willDelete) {
+                    return;
+                }
+
+                else {
+
+                    swal("Đã kích hoạt thành công!").then(() => {
+                        window.location.href = "/admin/manage-account/enable?userid=" + userid;
+                    });
+                }
+            });
+    }
+
+
+    oTable = $('#sampleTable').dataTable();
+    $('#all').click(function (e) {
+        $('#sampleTable tbody :checkbox').prop('checked', $(this).is(':checked'));
+        e.stopImmediatePropagation();
+    });
+
+
+    //Thời Gian
+    function time() {
+        var today = new Date();
+        var weekday = new Array(7);
+        weekday[0] = "Chủ Nhật";
+        weekday[1] = "Thứ Hai";
+        weekday[2] = "Thứ Ba";
+        weekday[3] = "Thứ Tư";
+        weekday[4] = "Thứ Năm";
+        weekday[5] = "Thứ Sáu";
+        weekday[6] = "Thứ Bảy";
+        var day = weekday[today.getDay()];
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1;
+        var yyyy = today.getFullYear();
+        var h = today.getHours();
+        var m = today.getMinutes();
+        var s = today.getSeconds();
+        m = checkTime(m);
+        s = checkTime(s);
+        nowTime = h + " giờ " + m + " phút " + s + " giây";
+        if (dd < 10) {
+            dd = '0' + dd
+        }
+        if (mm < 10) {
+            mm = '0' + mm
+        }
+        today = day + ', ' + dd + '/' + mm + '/' + yyyy;
+        tmp = '<span class="date"> ' + today + ' - ' + nowTime +
+            '</span>';
+        document.getElementById("clock").innerHTML = tmp;
+        clocktime = setTimeout("time()", "1000", "Javascript");
+
+        function checkTime(i) {
+            if (i < 10) {
+                i = "0" + i;
+            }
+            return i;
+        }
+    }
+
+
+    function searchByRole(){
+        var search_role = document.getElementById('search_role').value;
+        window.location.href="/admin/manage-account?search_role=" + search_role;
+    }
+
+
+    document.querySelectorAll('.edit').forEach(function (button) {
+        button.addEventListener('click', function () {
+            var userid = button.getAttribute("data-user-id");
+            var username = button.getAttribute('data-username');
+            var fullname = button.getAttribute("data-fullname");
+            var roles = [];
+            var InputRole = document.querySelectorAll('#user_role'+ userid);
+            InputRole.forEach((input) => {
+                roles.push(input.value);
+            })
+
+
+            var modal = document.getElementById('ModalUP');
+            modal.querySelector('#reset-password-button').addEventListener('click', () =>{
+                swal({
+                    title: "Cảnh báo",
+                    text: "Bạn có chắc chắn là muốn đặt lại mật khẩu cho tài khoản này?",
+                    buttons: ["Hủy bỏ", "Xác Nhận"],
+                })
+                    .then((willDelete) => {
+                        if (!willDelete){
+                            return;
+                        }
+                        if (document.getElementById('username').value !== 'Admin123' && username === 'Admin123'){
+                            swal({
+                                title: "Cảnh báo",
+                                text: "Bạn không thể đặt lại mật khẩu cho tài khoản Admin123!",
+                                buttons: {
+                                    close:{
+                                        text: "Đóng",
+                                        value: null,
+                                        visible: true,
+                                        className: "",
+                                        closeModal: true,
+                                    },
+                                },
+                            })
+                        }else {
+
+                            if (willDelete) {
+                                var pass = (Math.floor(Math.random() * 900000) + 100000);
+                                swal("Mật khẩu đặt lại thành công! Mật khẩu mới là " + pass).then(() => {
+                                    window.location.href = "/admin/manage-account/reset?userid=" + userid + "&pass=" + pass;
+                                });
+                            }
+                        }
+                    });
+            })
+
+            modal.querySelector('#user-id').value = '# '+userid;
+            modal.querySelector('#full-name').value = fullname;
+            modal.querySelectorAll('.form-check-input').forEach((checkbox) =>{
+
+                var checkId = checkbox.id;
+                if (roles.includes(checkId)){
+                    checkbox.checked = true;
+                }else{
+                    checkbox.checked = false;
+                }
+                if (username === 'Admin123' && checkbox.nextElementSibling.textContent === 'ADMIN') {
+                    checkbox.disabled = true;
+                } else {
+                    checkbox.disabled = false;
+                }
+
+            })
+        })
+
+
+    })
+
+    function disableUserByCheckbox(){
+        var disable_all = document.getElementById('all');
+        var checkbox_user = document.querySelectorAll('.checkbox-user');
+        var listunchecked = false;
+        checkbox_user.forEach((checkbox) => {
+            if (checkbox.checked){
+                listunchecked = true;
+            }
+        })
+        if (!disable_all.checked === true && !listunchecked === true){
+            swal("Chưa chọn người dùng", "Vui lòng chọn ít nhất một người dùng để kích hoạt.", "warning");
+        }else {
+        swal({
+            title:"Khóa tài khoản",
+            text: "Bạn có chắc muốn khóa những tài khoản đã chọn?",
+            buttons: ["Hủy bỏ", "Xác nhận"],
+            icon: "warning",
+        })
+            .then((willDelete) => {
+                if (!willDelete) {
+                    return;
+                }
+
+                var haveYourAccount = false;
+                checkbox_user.forEach((checkbox) => {
+                    if (checkbox.dataset.user === document.getElementById('username').value && checkbox.checked===true){
+                        haveYourAccount = true;
+                    }
+                })
+                var haveAdminAccount = false;
+                checkbox_user.forEach((checkbox) => {
+                    if ('Admin123' === checkbox.dataset.user && checkbox.checked===true){
+                        haveAdminAccount = true;
+                    }
+                })
+
+                if (haveAdminAccount){
+                    swal({
+                        title: "Cảnh báo",
+                        text: "Bạn không thể đặt lại mật khẩu cho tài khoản Admin123!",
+                        buttons: {
+                            close:{
+                                text: "Đóng",
+                                value: null,
+                                visible: true,
+                                className: "",
+                                closeModal: true,
+                            },
+                        },
+                    })
+                }else {
+
+                    if (haveYourAccount) {
+                        swal({
+                            title: "Khóa tài khoản",
+                            text: "Bạn có chắc muốn khóa tài khoản của mình?",
+                            buttons: ["Hủy bỏ", "Đồng ý"],
+                            icon: "warning",
+                        }).then((willDelete) => {
+                            if (willDelete) {
+                                swal("Đã khóa thành công!").then(() => {
+                                    document.getElementById('form-disable').submit();
+                                });
+                            }
+                        });
+                    } else {
+                        swal("Đã khóa thành công!").then(() => {
+                            document.getElementById('form-disable').submit();
+                        });
+                    }
+                }
+            });
+        }
+    }
+
+    function enableUserByCheckbox(){
+        var selectedUsers = [];
+        document.querySelectorAll('input[name="checkbox-user"]:checked').forEach(function (checkbox) {
+            selectedUsers.push(checkbox.value);
+        });
+
+        if (selectedUsers.length === 0) {
+            swal("Chưa chọn người dùng", "Vui lòng chọn ít nhất một người dùng để kích hoạt.", "warning");
+        } else {
+            swal({
+                title: "Kích hoạt người dùng",
+                text: "Bạn có chắc chắn muốn kích hoạt các người dùng đã chọn?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            }).then((willEnable) => {
+                if (willEnable) {
+                    swal("Đã kích hoạt thành công!").then(() => {
+                        document.getElementById('form-disable').action="/admin/manage-account/enable-all"
+                        document.getElementById('form-disable').submit();
+                    });
+                }
+            });
+        }
+    }
+
+
+    //Modal
+    $("#show-emp").on("click", function () {
+        $("#ModalUP").modal({backdrop: false, keyboard: false})
+    });
+
+
+</script>
+</body>
+
+</html>

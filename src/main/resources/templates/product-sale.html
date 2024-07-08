@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" class="no-js" lang="zxx">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <title>Project-SWP391</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.svg" />
+
+    <!-- ========================= CSS here ========================= -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/LineIcons.3.0.css" />
+    <link rel="stylesheet" href="/css/tiny-slider.css" />
+    <link rel="stylesheet" href="/css/glightbox.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="webjars/font-awesome/6.5.1/css/all.min.css"/>
+    <style>
+        .product-image img{
+            width: 288px;
+            height: 224px;
+            object-fit: cover;
+        }
+    </style>
+</head>
+
+<body>
+<!--[if lte IE 9]>
+<p class="browserupgrade">
+    You are using an <strong>outdated</strong> browser. Please
+    <a href="https://browsehappy.com/">upgrade your browser</a> to improve
+    your experience and security.
+</p>
+<![endif]-->
+
+<!-- Preloader -->
+<div class="preloader">
+    <div class="preloader-inner">
+        <div class="preloader-icon">
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+</div>
+<!-- /End Preloader -->
+
+<!-- Start Header Area -->
+<header th:insert="~{header-layout :: header}"></header>
+<!-- End Header Area -->
+
+<!-- Start Hero Area -->
+
+<!--&lt;!&ndash; Start Breadcrumbs &ndash;&gt;-->
+<!--<div class="breadcrumbs">-->
+<!--    <div class="container">-->
+<!--        <div class="row align-items-center">-->
+<!--            <div class="col-lg-6 col-md-6 col-12">-->
+<!--                <div class="breadcrumbs-content">-->
+<!--                    <h1 class="page-title">Shop Grid</h1>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="col-lg-6 col-md-6 col-12">-->
+<!--                <ul class="breadcrumb-nav">-->
+<!--                    <li><a href="index-2.html"><i class="lni lni-home"></i> Home</a></li>-->
+<!--                    <li><a href="javascript:void(0)">Shop</a></li>-->
+<!--                    <li>Shop Grid</li>-->
+<!--                </ul>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+<!--&lt;!&ndash; End Breadcrumbs &ndash;&gt;-->
+
+<div class="sale-image text-center">
+    <img src="images/Sale/Hansraj.png" alt="Sale Image" class="img-fluid">
+</div>
+<!-- Start Product Grids -->
+<section class="product-grids section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-12">
+                <div class="product-grids-head">
+                    <div class="product-grid-topbar">
+                        <div class="row align-items-center justify-content-center">
+                            <form action="/product-sale" method="get" class="d-flex w-100 justify-content-between">
+                                <div class="col-lg-4 col-md-4 col-12 d-flex justify-content-center">
+                                    <div class="product-sorting d-flex align-items-center">
+                                        <label for="sorting" class="mr-2">Sắp xếp theo:</label>
+                                        <select name="sort" class="form-control equal-size mr-2" id="sorting"  onchange="this.form.submit()">
+                                            <option th:selected="${sort.equals('asc')}" th:value="asc">Giá tăng dần</option>
+                                            <option th:selected="${sort.equals('desc')}" th:value="desc">Giá giảm dần</option>
+                                        </select>
+                                        <h3 class="total-show-product">Showing: <span>1 - 12 items</span></h3>
+                                    </div>
+                                </div>
+                                <div class="col-lg-8 col-md-8 col-12 d-flex justify-content-center">
+                                    <div class="search-bar text-center">
+                                        <div class="d-flex align-items-center justify-content-center">
+                                            <label class="mb-2" style="margin-right:20px">Search Product: </label>
+                                            <select name="type-device" class="form-control equal-size" onchange="this.form.submit()">
+                                                <option th:selected="${typedevicecheck==0}" th:value="0">Tất cả</option>
+                                                <option th:each="type : ${devices}" th:selected="${typedevicecheck==type.id}" th:text="${type.name}" th:value="${type.id}"></option>
+                                            </select>
+                                            <input name="search" type="text" placeholder="Tìm kiếm ở đây..." class="form-control equal-size" style="margin-left: 30px">
+                                            <button type="submit" class="btn btn-primary"><i class="lni lni-search-alt"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div  class="col-lg-12 col-12">
+                        <nav class="navbar navbar-expand-lg">
+                            <button class="navbar-toggler mobile-menu-btn" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                                    aria-expanded="false" aria-label="Toggle navigation">
+                                <span class="toggler-icon"></span>
+                                <span class="toggler-icon"></span>
+                                <span class="toggler-icon"></span>
+                            </button>
+                            <div class="collapse navbar-collapse sub-menu-bar" id="navbarSupportedContent">
+                                <ul id="nav" class="navbar-nav ms-auto">
+
+                                    <li class="nav-item"  >
+                                        <a th:href="@{/product-sale}">Thiết Bị</a>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <a th:href="@{/sale-accessory}">Phụ kiện</a>
+                                    </li>
+
+                                </ul>
+                            </div> <!-- navbar collapse -->
+                        </nav>
+
+
+                    </div>
+
+
+                    <div class="tab-content" id="nav-tabContent">
+                        <div class="tab-pane fade show active" id="nav-grid" role="tabpanel"
+                             aria-labelledby="nav-grid-tab">
+                            <div class="row">
+                                <div th:each="sale:${saleDevices}" class="col-lg-3 col-md-6 col-12">
+                                    <!-- Start Single Product -->
+                                    <div class="single-product">
+                                        <div class="product-image">
+                                            <img th:src="${sale.mainImage}" alt="#">
+                                            <span th:text="'- '+ ${sale.deviceDiscount}+'%'" class="sale-tag"></span>
+                                            <div class="button">
+                                                <a th:href="'/deviceDetail/'+${sale.getDeviceId()}" class="btn">Xem chi tiết</a>
+                                            </div>
+                                        </div>
+                                        <div class="product-info">
+                                            <span th:text="${sale.typeDeviceName}" class="category"></span>
+                                            <h4 class="title">
+                                                <a th:text="${sale.deviceName}" th:href="'/deviceDetail/'+${sale.getDeviceId()}"></a>
+                                            </h4>
+<!--                                            <div class="price">-->
+<!--                                                <div>-->
+<!--                                                   <span th:text="${sale.price* (1 - sale.sale.discount)}+' VND'"></span>-->
+<!--                                                </div>-->
+<!--                                                <div>-->
+<!--                                                    <span th:text="${sale.price} +' VND'" class="discount-price"></span>-->
+<!--                                                </div>-->
+
+<!--                                            </div>-->
+                                            <div class="price">
+                                                <div>
+                                                    <span th:text="${#numbers.formatDecimal(sale.devicePrice* ( 1 - sale.deviceDiscount/100), 0, 'COMMA', 2, 'POINT')} + ' VND'"></span>
+                                                </div>
+                                                <div>
+                                                    <span th:text="${#numbers.formatDecimal(sale.devicePrice, 0, 'COMMA', 2, 'POINT')} + ' VND'" class="discount-price"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- End Single Product -->
+                                </div>
+                            </div>
+                            <!-- Pagination -->
+
+                        </div>
+                        <!--/ End Pagination -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-12 col-12" aria-label="Page navigation ">
+
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${!saleDevices.hasPrevious()} ? 'disabled' : ''">
+                    <a class="page-link" th:href="@{'?pageNo=' + ${currentPage - 1}+'&type-device='+${typedevicecheck}+ '&search='+ ${search}+'&sort='+${sort}}" tabindex="-1">Lùi</a>
+                </li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPage - 1)}"
+                    th:classappend="${i == currentPage ? 'active' : ''}">
+                    <a class="page-link" th:href="@{'/product-sale?pageNo=' + ${i}+'&type-device='+${typedevicecheck}+ '&search='+ ${search}+'&sort='+${sort}}" th:text="${i + 1}">1</a>
+                </li>
+                <li class="page-item" th:classappend="${!saleDevices.hasNext()} ? 'disabled' : ''">
+                    <a class="page-link" th:href="@{'?pageNo=' + ${currentPage + 1}+'&type-device='+${typedevicecheck}+ '&search='+ ${search}+'&sort='+${sort}}">Tiến</a>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+
+    </div>
+</section>
+
+<!-- End Product Grids -->
+
+<!-- Start Footer Area -->
+<footer th:insert="~{/footer-layout :: footer}"></footer>
+<!--/ End Footer Area -->
+
+<!-- ========================= scroll-top ========================= -->
+<a href="#" class="scroll-top">
+    <i class="lni lni-chevron-up"></i>
+</a>
+
+<!-- ========================= JS here ========================= -->
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/tiny-slider.js"></script>
+<script src="/js/glightbox.min.js"></script>
+<script src="/js/main.js"></script>
+</body>
+</html>

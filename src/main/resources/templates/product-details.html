@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+
+
+<!-- Mirrored from demo.graygrids.com/themes/shopgrids/product-details.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 22 May 2024 15:33:37 GMT -->
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="x-ua-compatible" content="ie=edge"/>
+    <title>Single Product - ShopGrids Bootstrap 5 eCommerce HTML Template.</title>
+    <meta name="description" content=""/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.svg"/>
+
+    <!-- ========================= CSS here ========================= -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/LineIcons.3.0.css"/>
+    <link rel="stylesheet" href="/css/tiny-slider.css"/>
+    <link rel="stylesheet" href="/css/glightbox.min.css"/>
+    <link rel="stylesheet" href="/css/main.css"/>
+    <style>
+        .storage-options,
+        .color-options {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .storage {
+            width: 70px;
+        }
+
+        label {
+            text-align: center;
+            cursor: pointer;
+        }
+
+        input[type="radio"] {
+            display: none;
+        }
+
+        label span {
+            display: block;
+            margin: 10px 10px;
+            padding: 5px 0;
+            border-radius: 6px;
+            border: 1px solid #edeeef;
+        }
+
+        .color-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .color-box {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-bottom: 5px;
+            border: 2px solid transparent;
+        }
+
+        input[type="radio"]:checked + span {
+            border: 1px solid blue;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+<!--[if lte IE 9]>
+<p class="browserupgrade">
+    You are using an <strong>outdated</strong> browser. Please
+    <a href="https://browsehappy.com/">upgrade your browser</a> to improve
+    your experience and security.
+</p>
+<![endif]-->
+
+<!-- Preloader -->
+<div class="preloader">
+    <div class="preloader-inner">
+        <div class="preloader-icon">
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+</div>
+<!-- /End Preloader -->
+
+<!-- Start Header Area -->
+<header th:insert="~{header-layout :: header}"></header>
+<!-- End Header Area -->
+
+<!-- Start Breadcrumbs -->
+<div class="breadcrumbs">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 col-md-6 col-12">
+                <div class="breadcrumbs-content">
+                    <h1 class="page-title" th:text="${device.name}"></h1>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-12">
+                <ul class="breadcrumb-nav">
+                    <li><a href="/home"><i class="lni lni-home"></i> Home</a></li>
+                    <li th:text="${device.name}"></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Breadcrumbs -->
+
+<!-- Start Item Details -->
+<section class="item-details section">
+    <div class="container">
+        <div th:if="${param.success}" class="alert alert-success" role="alert">
+            Thêm vào giỏ hàng thành công!
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+            <span th:text="${errorMessage}"></span>
+        </div>
+        <div class="top-area">
+            <div class="row align-items-center">
+                <div class="col-lg-4 col-md-12 col-12">
+                    <div class="product-images">
+                        <main id="gallery">
+                            <div class="main-img">
+                                <div class="carousel-container">
+                                    <div class="carousel">
+                                        <div class="carousel-images">
+                                            <img th:src="${device.mainImage}">
+                                            <img th:each="img : ${device.deviceImages}" th:src="${img.image}">
+                                        </div>
+                                    </div>
+                                    <div class="thumbnails-container">
+                                        <button class="prev" onclick="prevThumbs()">&#10094;</button>
+                                        <div class="thumbnails-wrapper">
+                                            <div class="thumbnails">
+                                                <img th:src="${device.mainImage}" onclick="currentSlide(1)">
+                                                <img th:each="img, stt : ${device.deviceImages}" th:src="${img.image}"
+                                                     th:onclick="|currentSlide(${stt.count+1})|">
+                                            </div>
+                                        </div>
+                                        <button class="next" onclick="nextThumbs()">&#10095;</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </main>
+                    </div>
+                </div>
+                <div class="col-lg-8 col-md-12 col-12">
+                    <div class="product-info">
+                        <h1 class="title" id="namePro" th:text="${device.name}"></h1>
+                        <p class="category" th:text="'Số lượng còn lại ' + ${device.quantity} + ' sản phẩm'"><i
+                                class="lni lni-tag"></i></p>
+                        <form id="addToCart" th:action="@{/deviceDetail/add-to-cart}" th:object="${cartDetailsRequest}" method="post">
+                            <input type="hidden" th:field="*{deviceId}" th:value="${device.id}">
+                            <input type="hidden" name="productType" value="DEVICE">
+                            <div style="display: flex">
+                                <h3 th:class="price" th:if="${device.sale == null}"
+                                    th:text="${device.formatPrice(device.price)}"></h3>
+                                <h3 th:class="price" th:if="${device.sale != null}"
+                                    th:text="${device.formatPrice(device.getSalePrice())}"></h3>
+                                <h3 class="salePrice" th:if="${device.sale != null}"
+                                    th:text="${device.formatPrice(device.price)}"></h3>
+                                <h6 th:if="${device.sale != null}"
+                                    th:text="${' (-' + device.sale.formatDiscount() +')'}"></h6>
+                            </div>
+
+                            <div>
+                                <img src="/images/logo/icon-baohanh.png" style="height: 20px">
+                                <span>Bảo hành chính hãng 12 tháng.</span>
+                            </div>
+                            <div style="margin-bottom: 20px">
+                                <img src="/images/logo/1-1.jpg" style="height: 20px">
+                                <span>1 đổi 1 trong 1 tháng nếu lỗi, đổi sản phẩm tại nhà trong 1 ngày.</span>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-12">
+                                    <input type="hidden" id="storage" th:value="${device.ROM}">
+                                    <h6 th:if="${listRom != null and !listRom.isEmpty() and listRom.get(0) != null and !listRom.get(0).isEmpty()}">Dung Lượng Bộ nhớ</h6>
+                                    <div class="storage-options">
+                                        <label th:if="${listRom != null and !listRom.isEmpty() and listRom.get(0) != null and !listRom.get(0).isEmpty()}" th:each="rom : ${listRom}">
+                                            <input type="radio" name="storage" th:value="${rom}"
+                                                   th:checked="${device.ROM.equalsIgnoreCase(rom)}"
+                                                   onclick="window.location='/deviceDetail/' + document.getElementById('namePro').innerText + '/' + this.value"/>
+                                            <span class="storage" th:text="${rom}"></span>
+                                        </label>
+                                    </div>
+                                    <h6>Màu sắc</h6>
+                                    <div class="color-options">
+                                        <label th:if="${!listColor.isEmpty()}" th:each="color : ${listColor}">
+                                            <input type="radio" name="color" th:value="${color.getKey()}"
+                                                   th:checked="${device.colorName.equalsIgnoreCase(color.getKey())}"
+                                                   onclick="chooseColor(this)"/>
+                                            <span class="color-option">
+                                        <span class="color-box"
+                                              th:style="|background-color : ${color.getValue()}|"></span>
+                                        <span class="color-name" th:text="${color.getKey()}"></span>
+                                        </span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-4 col-12">
+                                    <div class="form-group quantity">
+                                        <label>Số lượng</label>
+                                        <input class="form-control" id="quantity" name="quantity" th:field="*{quantity} "
+                                               style="height: 46px" type="number" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bottom-content">
+                                <div class="row align-items-end">
+                                    <div class="col-lg-4 col-md-4 col-12">
+                                        <div class="button cart-button">
+                                            <button class="btn" style="width: 100%;" type="button"
+                                                    th:onclick="|addToCart(document.getElementById('quantity'),
+                                                document.getElementById('namePro'),
+                                                ${device.quantity})|">Thêm vào giỏ hàng
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="product-details-info">
+            <div class="single-block">
+                <div class="row">
+                    <div class="col-lg-6 col-12">
+                        <div class="info-body custom-responsive-margin">
+                            <h4>Mô tả</h4>
+                            <p th:text="${device.description}"></p>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-12">
+                        <div class="info-body">
+                            <h4>Thông số kỹ thuật</h4>
+                            <ul class="normal-list">
+                                <li th:if="${!device.screen.isEmpty()}"><span>Màn hình:</span> <span
+                                        th:text="${device.screen}"></span></li>
+                                <li th:if="${!device.camera.isEmpty()}"><span>Camera sau:</span> <span
+                                        th:text="${device.camera}"></span></li>
+                                <li th:if="${!device.frontCamera.isEmpty()}"><span>Camera trước:</span> <span
+                                        th:text="${device.frontCamera}"></span></li>
+                                <li th:if="${!device.RAM.isEmpty()}"><span>RAM:</span> <span
+                                        th:text="${device.RAM}"></span></li>
+                                <li th:if="${!device.ROM.isEmpty()}"><span>Bộ nhớ trong:</span> <span
+                                        th:text="${device.ROM}"></span></li>
+                                <li th:if="${!device.CPU.isEmpty()}"><span>CPU:</span> <span
+                                        th:text="${device.CPU}"></span></li>
+                                <li th:if="${!device.GPU.isEmpty()}"><span>GPU:</span> <span
+                                        th:text="${device.GPU}"></span></li>
+                                <li th:if="${!device.battery.isEmpty()}"><span>Dung lượng pin:</span> <span
+                                        th:text="${device.battery}"></span></li>
+                                <li th:if="${!device.SIM.isEmpty()}"><span>Thẻ sim:</span> <span
+                                        th:text="${device.SIM}"></span></li>
+                                <li th:if="${!device.OS.isEmpty()}"><span>Hệ diều hành:</span> <span
+                                        th:text="${device.OS}"></span></li>
+                                <li th:if="${!device.HDD.isEmpty()}"><span>HHD:</span> <span
+                                        th:text="${device.HDD}"></span></li>
+                                <li th:if="${!device.size.isEmpty()}"><span>Kích thước:</span> <span
+                                        th:text="${device.size}"></span></li>
+                                <li th:if="${!device.weight.isEmpty()}"><span>Trọng lượng:</span> <span
+                                        th:text="${device.weight}"></span></li>
+                                <li th:if="${!device.material.isEmpty()}"><span>Chất liệu:</span> <span
+                                        th:text="${device.material}"></span></li>
+                                <li th:if="${!device.origin.isEmpty()}"><span>Xuất xứ:</span> <span
+                                        th:text="${device.origin}"></span></li>
+                                <li th:if="${device.dateRelease != null}"><span>Thời gian ra mắt:</span> <span
+                                        th:text="${device.formatDate()}"></span></li>
+                            </ul>
+                            <!--                            <h4>Shipping Options:</h4>-->
+                            <!--                            <ul class="normal-list">-->
+                            <!--                                <li><span>Courier:</span> 2 - 4 days, $22.50</li>-->
+                            <!--                                <li><span>Local Shipping:</span> up to one week, $10.00</li>-->
+                            <!--                                <li><span>UPS Ground Shipping:</span> 4 - 6 days, $18.00</li>-->
+                            <!--                                <li><span>Unishop Global Export:</span> 3 - 4 days, $25.00</li>-->
+                            <!--                            </ul>-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4 col-12">
+                    <div class="single-block give-review">
+                        <h4 th:if="${!device.averageRating().equalsIgnoreCase('nan')}"
+                            th:text="'Số sao đánh giá trung bình: ' + ${device.averageRating()}"></h4>
+                        <ul>
+                            <li>
+                                <span th:text="${device.countByStar(5) + ' đánh giá'}"></span>
+                                <i class="lni lni-star-filled"></i>
+                                <i class="lni lni-star-filled"></i>
+                                <i class="lni lni-star-filled"></i>
+                                <i class="lni lni-star-filled"></i>
+                                <i class="lni lni-star-filled"></i>
+                            </li>
+                            <li>
+                                <span th:text="${device.countByStar(4) + ' đánh giá'}"></span>
+                                <i class="lni lni-star-filled"></i>
+                                <i class="lni lni-star-filled"></i>
+                                <i class="lni lni-star-filled"></i>
+                                <i class="lni lni-star-filled"></i>
+                                <i class="lni lni-star"></i>
+                            </li>
+                            <li>
+                                <span th:text="${device.countByStar(3) + ' đánh giá'}"></span>
+                                <i class="lni lni-star-filled"></i>
+                                <i class="lni lni-star-filled"></i>
+                                <i class="lni lni-star-filled"></i>
+                                <i class="lni lni-star"></i>
+                                <i class="lni lni-star"></i>
+                            </li>
+                            <li>
+                                <span th:text="${device.countByStar(2) + ' đánh giá'}"></span>
+                                <i class="lni lni-star-filled"></i>
+                                <i class="lni lni-star-filled"></i>
+                                <i class="lni lni-star"></i>
+                                <i class="lni lni-star"></i>
+                                <i class="lni lni-star"></i>
+                            </li>
+                            <li>
+                                <span th:text="${device.countByStar(1) + ' đánh giá'}"></span>
+                                <i class="lni lni-star-filled"></i>
+                                <i class="lni lni-star"></i>
+                                <i class="lni lni-star"></i>
+                                <i class="lni lni-star"></i>
+                                <i class="lni lni-star"></i>
+                            </li>
+                        </ul>
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn review-btn" data-bs-toggle="modal" id="btnFeedback"
+                                data-bs-target="#exampleModal" sec:authorize="!isAnonymous()">
+                            Tạo đánh giá
+                        </button>
+                    </div>
+                </div>
+                <div class="col-lg-8 col-12" style="max-height: 500px; overflow-y: auto;">
+                    <div class="single-block">
+                        <div class="reviews">
+                            <h4 class="title">Đánh giá gần nhất</h4>
+                            <p th:if="${device.feedbacks.isEmpty()}" style="color: #0a53be">Hãy là người đầu tiên đánh
+                                giá sản phẩm này</p>
+                            <!-- Start Single Review -->
+                            <div class="single-review" th:each="feedback : ${device.reverseList()}">
+                                <img src="https://shopdunk.com/images/thumbs/default-avatar_120.jpg" alt="#">
+                                <div class="review-info">
+                                    <h4 th:inline="text">
+                                        [[${feedback.getUser().getLastname()}]]
+                                        <span th:text="${feedback.formatDate()}">
+                                            </span>
+                                    </h4>
+                                    <ul class="stars">
+                                        <li th:each="i:${#numbers.sequence(1, feedback.star)}"><i
+                                                class="lni lni-star-filled"></i></li>
+                                        <li th:if="${feedback.star<5}"
+                                            th:each="i:${#numbers.sequence(1, 5 - feedback.star)}"><i
+                                                class="lni lni-star"></i></li>
+                                    </ul>
+                                    <p id="content" th:text="${feedback.content}"></p>
+                                    <div th:if="${#authentication.principal.id == feedback.getUser().getId()}"
+                                         style="margin-top: 5px">
+                                        <button class="btn btn-primary btn-sm trash" type="button" title="Xóa"
+                                                th:onclick="|deleteFeedback(${feedback.id},${device.id})|">Xóa
+                                        </button>
+                                        <button class="btn btn-primary btn-sm edit" type="button" title="Sửa"
+                                                th:onclick="|updateFeedback(${feedback.id},${feedback.star},
+                                            document.getElementById('content'))|">Chỉnh Sửa
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- End Single Review -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- End Item Details -->
+
+<!-- Review Modal -->
+<div class="modal fade review-modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="/saveFeedback" method="post" onsubmit="window.alert('Đánh giá sản phẩm thành công!')">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Đánh giá sản phẩm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label for="review-rating">Đánh giá số sao</label>
+                                <select class="form-control" id="review-rating" name="star">
+                                    <option value="5">5 Sao</option>
+                                    <option value="4">4 Sao</option>
+                                    <option value="3">3 Sao</option>
+                                    <option value="2">2 Sao</option>
+                                    <option value="1">1 Sao</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="review-message">Nội dung</label>
+                        <textarea class="form-control" id="review-message" rows="8" name="content" required></textarea>
+                    </div>
+                </div>
+                <input id="feedbackId" name="feedbackId" type="hidden" value="0">
+                <input name="userId" type="hidden" th:value="${#authentication.principal.id}">
+                <input name="productId" type="hidden" th:value="${device.id}">
+                <input name="typeProduct" type="hidden" value="device">
+                <div class="modal-footer button">
+                    <button type="submit" class="btn">Gửi đánh giá</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- End Review Modal -->
+
+<!-- Start Footer Area -->
+<footer th:insert="~{footer-layout :: footer}"></footer>
+<!--/ End Footer Area -->
+
+<!-- ========================= scroll-top ========================= -->
+<a href="#" class="scroll-top">
+    <i class="lni lni-chevron-up"></i>
+</a>
+
+<!-- ========================= JS here ========================= -->
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/tiny-slider.js"></script>
+<script src="/js/glightbox.min.js"></script>
+<script src="/js/main.js"></script>
+<script th:src="@{/js/header.js}"></script>
+<script type="text/javascript">
+    let slideIndex = 1;
+    let thumbIndex = 0;
+    const thumbVisibleCount = 5;
+
+    showSlides(slideIndex);
+    showThumbnails(thumbIndex);
+
+    function nextSlide() {
+        showSlides((slideIndex += 1));
+    }
+
+    function prevSlide() {
+        showSlides((slideIndex -= 1));
+    }
+
+    function currentSlide(n) {
+        showSlides((slideIndex = n));
+    }
+
+    function showSlides(n) {
+        const slides = document.querySelectorAll(".carousel-images img");
+        const thumbnails = document.querySelectorAll(".thumbnails img");
+
+        if (n > slides.length) {
+            slideIndex = slides.length;
+        }
+
+        if (n < 1) {
+            slideIndex = 1;
+        }
+
+        slides.forEach((slide) => (slide.style.display = "none"));
+        thumbnails.forEach((thumb) => thumb.classList.remove("active"));
+
+        slides[slideIndex - 1].style.display = "block";
+        thumbnails[slideIndex - 1].classList.add("active");
+    }
+
+    function nextThumbs() {
+        nextSlide();
+        const thumbnails = document.querySelectorAll(".thumbnails img");
+        if (thumbIndex + thumbVisibleCount < thumbnails.length) {
+            thumbIndex += 1;
+            showThumbnails(thumbIndex);
+        }
+    }
+
+    function prevThumbs() {
+        prevSlide();
+        if (thumbIndex > 0) {
+            thumbIndex -= 1;
+            showThumbnails(thumbIndex);
+        }
+    }
+
+    function showThumbnails(startIndex) {
+        const thumbnails = document.querySelector(".thumbnails");
+        const thumbWidth =
+            document.querySelector(".thumbnails img").offsetWidth;
+        const margin = parseInt(
+            window.getComputedStyle(document.querySelector(".thumbnails img"))
+                .marginRight
+        );
+
+        const offset = -startIndex * (thumbWidth + margin);
+        thumbnails.style.transform = `translateX(${offset}px)`;
+    }
+</script>
+<script>
+
+
+
+    function checkQuantity(order, quantity) {
+        var orderQuantity = order.value;
+        if (orderQuantity <= 0) {
+            alert('Số lượng bạn mua phải lớn hơn 0');
+            return false;
+        }
+        if (orderQuantity > quantity) {
+            alert('Số lượng bạn mua vượt quá số lượng sản phẩm hiện có');
+            return false;
+        }
+        return true;
+    }
+
+    function chooseColor(color) {
+        var name = document.getElementById('namePro');
+        var storge = document.getElementById('storage');
+        if(storge.value === ''){
+            window.location='/deviceDetail/color/' + name.innerText + '/'+ color.value;
+        }
+        else {
+            window.location = '/deviceDetail/' + name.innerText + '/' + storge.value + '/' + color.value;
+        }
+    }
+
+    function addToCart(order, product, quantity) {
+        if (window.confirm('Bạn muốn thêm sản phẩm ' + product.innerText + ' vào giỏ hàng?')) {
+            if (checkQuantity(order, quantity)) {
+                document.getElementById('addToCart').submit();
+            }
+        }
+    }
+
+    function deleteFeedback(feedbackId, deviceId) {
+        if (window.confirm('Bạn chắc chắn muốn xóa đánh giá này?')) {
+            window.alert('Đã xóa thành công');
+            window.location = '/deleteFeedback/' + feedbackId + '/' + deviceId + '/device';
+        }
+    }
+
+    function updateFeedback(feedbackId, star, message) {
+        var btnFeedback = document.getElementById('btnFeedback');
+        btnFeedback.click();
+        var rating = document.getElementById('review-rating');
+        var mess = document.getElementById('review-message');
+        rating.value = star;
+        mess.value = message.innerText;
+        document.getElementById('feedbackId').value = feedbackId;
+    }
+
+
+
+</script>
+
+
+</body>
+
+
+<!-- Mirrored from demo.graygrids.com/themes/shopgrids/product-details.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 22 May 2024 15:33:39 GMT -->
+</html>

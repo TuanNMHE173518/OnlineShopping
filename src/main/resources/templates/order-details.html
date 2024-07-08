@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Danh sách đơn hàng | Quản trị Admin</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Main CSS-->
+    <link rel="stylesheet" type="text/css" href="/css/mainSA.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+    <!-- or -->
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@latest/css/boxicons.min.css">
+
+    <!-- Font-icon css-->
+    <link rel="stylesheet" type="text/css"
+          href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
+
+</head>
+
+<body onload="time()" class="app sidebar-mini rtl">
+<!-- Navbar-->
+<div th:replace="~{navbar-layout :: navbar-admin}"></div>
+<main class="app-content">
+    <div class="app-title">
+        <ul class="app-breadcrumb breadcrumb side">
+            <li class="breadcrumb-item active"><a href="#"><b>Chi tiết đơn hàng</b></a></li>
+        </ul>
+        <div id="clock"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tile">
+                <div class="tile-body">
+                    <div class="row element-button">
+                        <div class="col-sm-2">
+                            <a class="btn btn-delete btn-sm" type="button" title="Xóa"
+                               onclick="window.location='/manage-order/listOrder'"><i
+                                    class="fa fa-arrow-left"></i> Quay lại </a>
+                        </div>
+                    </div>
+                    <form id="form" action="/manage-order/changeStatus" method="post">
+                    <table class="table table-hover table-bordered" id="sampleTable">
+                        <thead>
+                        <tr>
+                            <th>ID đơn hàng</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Hình ảnh</th>
+                            <th>Màu sắc</th>
+                            <th>Bộ nhớ</th>
+                            <th>Số lượng</th>
+                            <th>Giá bán</th>
+                            <th>Loại sản phẩm</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="detail : ${listDetail}">
+                            <td th:text="${detail.order.id}"></td>
+                            <td th:text="${detail.device != null ? detail.device.name : detail.accessory.name}"></td>
+                            <td>
+                                <img th:src="${detail.device != null ? detail.device.mainImage : detail.accessory.mainImage}" alt="" width="80px;">
+                            </td>
+                            <td th:text="${detail.device != null ? detail.device.colorName : detail.accessory.colorName}"></td>
+                            <td th:text="${detail.device != null ? detail.device.ROM : ''}"></td>
+                            <td th:text="${detail.quantity}"></td>
+                            <td th:text="${detail.formatPrice()}"></td>
+                            <td th:text="${detail.productType.name().equalsIgnoreCase('device')?'Thiết bị':'Phụ kiện'}"></td>
+                        </tr>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <th th:text="'Tổng tiền: '+${order.formatPrice()}" colspan="2"></th>
+                            <th th:text="'Tên khách hàng: ' + ${order.getUser().getLastname()}" colspan="2"></th>
+                            <th th:text="'Ngày đặt hàng: ' + ${order.formatDate()}" colspan="2"></th>
+                            <th>Tình trạng</th>
+                            <th>
+                                <select th:if="${order.status.equals('Chờ xử lý')}" class="badge bg-dark" name="status" onchange="changeStatus(this)">
+                                    <option value="Chờ xử lý" selected>Chờ xử lý</option>
+                                    <option value="Đã hủy">Đã hủy</option>
+                                    <option value="Đang vận chuyển">Đang vận chuyển</option>
+                                    <option value="Đã thanh toán">Đã thanh toán</option>
+                                    <option value="Đã hoàn thành">Đã hoàn thành</option>
+                                </select>
+                                <select th:if="${order.status.equals('Đang vận chuyển')}" class="badge bg-dark" name="status" onchange="changeStatus(this)">
+                                    <option value="Chờ xử lý">Chờ xử lý</option>
+                                    <option value="Đã hủy">Đã hủy</option>
+                                    <option value="Đang vận chuyển" selected>Đang vận chuyển</option>
+                                    <option value="Đã thanh toán">Đã thanh toán</option>
+                                    <option value="Đã hoàn thành">Đã hoàn thành</option>
+                                </select>
+                                <select th:if="${order.status.equals('Đã thanh toán')}" class="badge bg-dark" name="status" onchange="changeStatus(this)">
+                                    <option value="Chờ xử lý">Chờ xử lý</option>
+                                    <option value="Đã hủy">Đã hủy</option>
+                                    <option value="Đang vận chuyển">Đang vận chuyển</option>
+                                    <option value="Đã thanh toán" selected>Đã thanh toán</option>
+                                    <option value="Đã hoàn thành">Đã hoàn thành</option>
+                                </select>
+                                <span class="badge bg-success" th:if="${order.status.equals('Đã hoàn thành')}" th:text="${order.status}"></span>
+                                <span class="badge bg-danger" th:if="${order.status.equals('Đã hủy')}" th:text="${order.status}"></span>
+                            </th>
+                        </tr>
+                        </tfoot>
+                    </table>
+                    <input type="hidden" name="orderId" th:value="${order.id}">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<!-- Essential javascripts for application to work-->
+<script src="/js/jquery-3.2.1.min.js"></script>
+<script src="/js/popper.min.js"></script>
+<script src="/js/bootstrapSA.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="/js/mainSA.js"></script>
+<!-- The javascript plugin to display page loading on top-->
+<script src="/js/plugins/pace.min.js"></script>
+<!-- Page specific javascripts-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+
+<script>
+    function changeStatus(status) {
+        swal({
+            title: "Cảnh báo",
+
+            text: "Bạn có chắc chắn là muốn chuyển trạng thái đơn hàng này sang " + status.value +'?',
+            buttons: ["Hủy bỏ", "Đồng ý"],
+        })
+            .then((willChange) => {
+                if (willChange) {
+                    swal("Thay đổi thành công.!", {});
+                    document.getElementById('form').submit();
+                }
+            });
+    }
+</script>
+</body>
+
+</html>

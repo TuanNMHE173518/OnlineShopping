@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html class="no-js" lang="zxx" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+
+
+<!-- Mirrored from demo.graygrids.com/themes/shopgrids/checkout.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 22 May 2024 15:33:39 GMT -->
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <title>Checkout - ShopGrids Bootstrap 5 eCommerce HTML Template.</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.svg" />
+
+    <!-- ========================= CSS here ========================= -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/LineIcons.3.0.css" />
+    <link rel="stylesheet" href="/css/tiny-slider.css" />
+    <link rel="stylesheet" href="/css/glightbox.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+
+</head>
+
+<body>
+    <!--[if lte IE 9]>
+      <p class="browserupgrade">
+        You are using an <strong>outdated</strong> browser. Please
+        <a href="https://browsehappy.com/">upgrade your browser</a> to improve
+        your experience and security.
+      </p>
+    <![endif]-->
+
+    <!-- Preloader -->
+    <div class="preloader">
+        <div class="preloader-inner">
+            <div class="preloader-icon">
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+    <!-- /End Preloader -->
+
+    <!-- Start Header Area -->
+    <header th:insert="~{header-layout :: header}"></header>
+    <!-- End Header Area -->
+
+    <!-- Start Breadcrumbs -->
+    <div class="breadcrumbs">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 col-md-6 col-12">
+                    <div class="breadcrumbs-content">
+                        <h1 class="page-title">checkout</h1>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6 col-12">
+                    <ul class="breadcrumb-nav">
+                        <li><a href="index-2.html"><i class="lni lni-home"></i> Home</a></li>
+                        <li><a href="index-2.html">Shop</a></li>
+                        <li>checkout</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Breadcrumbs -->
+
+    <!--====== Checkout Form Steps Part Start ======-->
+
+    <section class="checkout-wrapper section">
+        <div class="container">
+
+            <form id="formcheckout" action="/checkout/confirm" method="post">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="checkout-steps-form-style-1">
+                            <ul id="accordionExample">
+                                <li>
+                                    <h6 class="title" data-bs-toggle="collapse" data-bs-target="#collapseThree"
+                                        aria-expanded="true" aria-controls="collapseThree">Thông tin người nhận </h6>
+                                    <section class="checkout-steps-form-content collapse show" id="collapseThree"
+                                             aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="single-form form-default">
+                                                    <label>Họ và tên</label>
+                                                    <div class="row">
+                                                        <div class="col-md-12 form-input form">
+                                                            <input type="text" th:value="${user.firstname +' ' + user.lastname}" required name="full-name" placeholder="Họ và tên">
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="single-form form-default">
+                                                    <label>Email</label>
+                                                    <div class="form-input form">
+                                                        <input type="text" th:value="${user.email}" name="email" required placeholder="Email">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="single-form form-default">
+                                                    <label>Số điện thoại</label>
+                                                    <div class="form-input form">
+                                                        <input type="text" th:value="${user.phone}" name="phone" required placeholder="+84">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="single-form form-default">
+                                                    <label>Tỉnh/Thành phố</label>
+                                                    <div class="select-items">
+                                                        <select class="form-control tinh" id="tinh" name="tinh" title="Chọn Tỉnh Thành">
+                                                            <option value="">Tỉnh Thành</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="single-form form-default">
+                                                    <label>Quận/Huyện</label>
+                                                    <div class="select-items">
+                                                        <select class="form-control" id="quan" name="quan" title="Chọn Quận Huyện">
+                                                            <option value="">Quận Huyện</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="single-form form-default">
+                                                    <label>Phường/Xã</label>
+                                                    <div class="select-items">
+                                                        <select class="form-control" id="phuong" name="phuong" title="Chọn Phường Xã">
+                                                            <option value="">Phường Xã</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="single-form form-default">
+                                                    <label>Địa chỉ nhà</label>
+                                                    <div class="form-input form">
+                                                        <input type="text" th:value="${user.address}" name="address" required placeholder="Số nhà">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="single-form button">
+                                                    <button type="button" class="btn" data-bs-toggle="collapse"
+                                                            data-bs-target="#collapseFour" aria-expanded="false"
+                                                            aria-controls="collapseFour">Tiếp</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </li>
+                                <li>
+                                    <h6 class="title collapsed" data-bs-toggle="collapse" data-bs-target="#collapseFour"
+                                        aria-expanded="false" aria-controls="collapseFour">Phương thức vận chuyển</h6>
+                                    <section class="checkout-steps-form-content collapse" id="collapseFour"
+                                             aria-labelledby="headingFour" data-bs-parent="#accordionExample">
+                                        <div class="row">
+
+                                            <div class="col-md-12">
+                                                <div class="checkout-payment-option">
+                                                    <h6 class="heading-6 font-weight-400 payment-title">Chọn hình thức giao hàng</h6>
+                                                    <div class="payment-option-wrapper">
+                                                        <div class="single-payment-option">
+                                                            <input type="radio" name="shipping" value="30000" onchange="addShipPrice(this.value)" checked id="shipping-1">
+                                                            <label for="shipping-1">
+                                                                <img width="120px" height="120px" src="/images/shipping/shipping-1.jpg"
+                                                                     alt="Sipping">
+                                                                <p>Chuyển phát nhanh</p>
+                                                                <span class="price">30.000 VNĐ</span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="single-payment-option">
+                                                            <input type="radio" name="shipping" value="15000" onchange="addShipPrice(this.value)" id="shipping-2">
+                                                            <label for="shipping-2">
+                                                                <img width="120px" height="120px" src="/images/shipping/shipping-2.jpg"
+                                                                     alt="Sipping">
+                                                                <p>Giao hàng tiết kiệm</p>
+                                                                <span class="price">15.000 VNĐ</span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </section>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="checkout-sidebar">
+
+                            <div class="checkout-sidebar-price-table mt-30">
+                                <h5 class="title">Bảng giá</h5>
+
+                                <div class="sub-total-price">
+                                    <div class="total-price">
+                                        <p class="value">Tiền sản phẩm:</p>
+                                        <p id="price" class="price" th:text="${#numbers.formatDecimal(totalPrice, 0,0) + ' VNĐ'}"></p>
+                                    </div>
+                                    <div class="total-price shipping">
+                                        <p class="value">Phí ship:</p>
+                                        <p id="ship-price"  class="price">30000 VNĐ</p>
+                                    </div>
+
+                                </div>
+
+                                <div class="total-payable">
+                                    <div class="payable-price">
+                                        <p class="value">Tổng tiền:</p>
+                                        <p id="total-price" class="price" th:text="${#numbers.formatDecimal(totalPrice + 30000, 0,0) + ' VNĐ'}"></p>
+                                    </div>
+                                </div>
+                                <input type="hidden" value="30000" name="totalPrice"/>
+                                <div class="price-table-btn button">
+                                    <button type="submit"  class="btn btn-alt">Thanh toán ngay</button>
+                                </div>
+                                <input id="priceInput" type="hidden" name="amount" th:value="${#numbers.formatDecimal(totalPrice+ 30000, 0,0)}">
+                                <input th:each="cart : ${cartIds}" type="hidden" name="cartIds" th:value="${cart}">
+                                <div class="price-table-btn button">
+                                    <button type="button" onclick="submitSaveOrder()" class="btn btn-alt">Thanh toán khi nhận hàng</button>
+                                </div>
+
+                            </div>
+                            <div class="checkout-sidebar-banner mt-30">
+                                <a href="device.html">
+                                    <img src="/images/banner/banner.jpg" alt="#">
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+    <!--====== Checkout Form Steps Part Ends ======-->
+
+    <!-- Start Footer Area -->
+    <footer th:insert="~{footer-layout :: footer}"></footer>
+    <!--/ End Footer Area -->
+
+    <!-- ========================= scroll-top ========================= -->
+    <a href="#" class="scroll-top">
+        <i class="lni lni-chevron-up"></i>
+    </a>
+
+    <!-- ========================= JS here ========================= -->
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/tiny-slider.js"></script>
+    <script src="/js/glightbox.min.js"></script>
+    <script src="/js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="https://esgoo.net/scripts/jquery.js"></script>
+    <script src="/webjars/decimal.js/7.0.1/decimal.js"></script>
+    <script>
+        document.getElementById('formcheckout').addEventListener('submit', function (event){
+            var tinh = document.getElementById('tinh').value;
+            var quan = document.getElementById('quan').value;
+            var phuong = document.getElementById('phuong').value;
+
+            if (tinh === "" || quan === "0" || phuong === "0") {
+
+                event.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Bạn chưa chọn thông tin địa chỉ!',
+                    text: 'Vui lòng chọn đủ Tỉnh/Thành phố, Quận/Huyện và Phường/Xã.',
+                    confirmButtonText: 'OK'
+                });
+            }
+        })
+
+        function addShipPrice(ship) {
+            var subPrice = document.getElementById('ship-price');
+            var totalPrice = document.getElementById('total-price');
+            var price = document.getElementById('priceInput').value;
+            var shipPrice = parseInt(ship);
+            var priceInt = new Decimal(price);
+            var totalPriceDecimal = priceInt.plus(shipPrice);
+
+            subPrice.textContent = shipPrice + ' VNĐ';
+            totalPrice.textContent =  totalPriceDecimal.toString() + ' VNĐ';
+        }
+
+        function submitSaveOrder(){
+
+            var form = document.getElementById('formcheckout');
+            form.action ="/checkout/save-order";
+            form.submit();
+
+
+
+        }
+
+
+        $(document).ready(function() {
+            $.getJSON('https://esgoo.net/api-tinhthanh/1/0.htm',function(data_tinh){
+                if(data_tinh.error==0){
+                    $.each(data_tinh.data, function (key_tinh,val_tinh) {
+                        $("#tinh").append('<option id="'+val_tinh.id+'" value="'+val_tinh.full_name+'">'+val_tinh.full_name+'</option>');
+                    });
+                    $("#tinh").change(function(e){
+                        var idtinh=$(this).find('option:selected').attr('id');
+
+                        $.getJSON('https://esgoo.net/api-tinhthanh/2/'+idtinh+'.htm',function(data_quan){
+                            if(data_quan.error==0){
+                                $("#quan").html('<option value="0">Quận Huyện</option>');
+                                $("#phuong").html('<option value="0">Phường Xã</option>');
+                                $.each(data_quan.data, function (key_quan,val_quan) {
+                                    $("#quan").append('<option id="'+val_quan.id+'" value="'+val_quan.full_name+'">'+val_quan.full_name+'</option>');
+                                });
+
+                                $("#quan").change(function(e){
+                                    var idquan=$(this).find('option:selected').attr('id');
+                                    $.getJSON('https://esgoo.net/api-tinhthanh/3/'+idquan+'.htm',function(data_phuong){
+                                        if(data_phuong.error==0){
+                                            $("#phuong").html('<option value="0">Phường Xã</option>');
+                                            $.each(data_phuong.data, function (key_phuong,val_phuong) {
+                                                $("#phuong").append('<option id="'+val_phuong.id+'" value="'+val_phuong.full_name+'">'+val_phuong.full_name+'</option>');
+                                            });
+                                        }
+                                    });
+                                });
+
+                            }
+                        });
+                    });
+
+                }
+            });
+        });
+    </script>
+</body>
+
+
+</html>

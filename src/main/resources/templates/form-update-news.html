@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Thêm tin tức | Quản trị Admin</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Main CSS-->
+    <link rel="stylesheet" type="text/css" href="/css/mainSA.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+    <!-- or -->
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@latest/css/boxicons.min.css">
+
+    <!-- Font-icon css-->
+    <link rel="stylesheet" type="text/css"
+          href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
+
+</head>
+
+<body onload="time()" class="app sidebar-mini rtl">
+<!-- Navbar-->
+<div th:replace="~{navbar-layout :: navbar-admin}"></div>
+<main class="app-content">
+    <div class="app-title">
+        <ul class="app-breadcrumb breadcrumb side">
+            <li class="breadcrumb-item active"><a href="#"><b>Chỉnh sửa tin tức</b></a></li>
+        </ul>
+        <div id="clock"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tile">
+                <div class="tile-body">
+                    <h1>Sửa tin tức</h1>
+                    <form method="post" th:action="@{/manage-news/save}" enctype="multipart/form-data" >
+                        <div class="form-group">
+                            <label for="title" class="font-weight-bold">Nhập tiêu đề</label>
+                            <input type="text" class="form-control" id="title" name="title" th:value="${newsUpdate.title}" placeholder="Tiêu đề tin tức">
+                        </div>
+                        <div class="form-group">
+                            <label for="editor" class="font-weight-bold">Nội dung</label>
+                            <textarea id="editor" class="form-control resize-vertical" name="content"> </textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="file" class="font-weight-bold">Ảnh chính</label>
+                            <input type="file" class="form-control-file" id="file" multiple accept="image/*" oninput="imageNews(this)" name="image">
+                        </div>
+                        <div class="preview" id="filePreview">
+                            <image th:src="${newsUpdate.image}" ></image>
+                        </div>
+                        <input type="hidden" name="news-id" th:value="${newsUpdate.id}">
+                        <input type="hidden" id="valueEditor" th:value="${newsUpdate.content}">
+                        <button type="submit" class="btn btn-outline-info btn-lg btn-round mt-5">Chỉnh sửa</button>
+                        <a href="../manage-news" type="button" class="btn btn-outline-info btn-lg btn-round mt-5">Quay lại</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+
+<!-- Essential javascripts for application to work-->
+<script src="/js/jquery-3.2.1.min.js"></script>
+<script src="/js/popper.min.js"></script>
+<script src="/js/bootstrapSA.min.js"></script>
+
+<script src="/js/mainSA.js"></script>
+<!-- The javascript plugin to display page loading on top-->
+<script src="/js/plugins/pace.min.js"></script>
+
+
+
+<script type="text/javascript" src="/js/plugins/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/js/plugins/dataTables.bootstrap.min.js"></script>
+<script src="/webjars/ckeditor/4.19.0/full/ckeditor.js"></script>
+<script >
+
+    $('#sampleTable').DataTable({
+        info: true,
+        paging: true,
+        searching: true,
+    });
+
+</script>
+<script>
+    CKEDITOR.replace('editor', {
+    });
+
+    CKEDITOR.instances['editor'].setData(document.getElementById('valueEditor').value);
+</script>
+<script >
+
+
+
+
+    function imageNews(input) {
+        const file = input.files[0];
+        const preview = document.getElementById('filePreview');
+
+        preview.innerHTML = '';
+        const reader = new FileReader();
+        reader.onload = function (e) {
+
+            img.src = e.target.result;
+            preview.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+    }
+
+
+    function showInforNews(id){
+
+        swal({
+            title: "Chỉnh sửa",
+            text: "Bạn có muốn chỉnh sửa tin này?",
+            icon: "warning",
+            buttons: ["Hủy bỏ", "Đồng ý"],
+        }).then((willEdit) =>{
+            if (!willEdit){
+                return;
+            }else {
+                window.location.href="/manage-news?id="+id;
+            }
+        })
+
+
+
+
+    }
+</script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Thêm sản giảm giá | Quản trị Admin</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Main CSS-->
+    <link rel="stylesheet" type="text/css" href="/css/mainSA.css">
+    <!-- Font-icon css-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+    <!-- or -->
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@latest/css/boxicons.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script type="text/javascript" src="/ckeditor/ckeditor.js"></script>
+    <script src="http://code.jquery.com/jquery.min.js" type="text/javascript"></script>
+</head>
+
+<body onload="time()" class="app sidebar-mini rtl">
+<style>
+    .Choicefile {
+        display: block;
+        background: #14142B;
+        border: 1px solid #fff;
+        color: #fff;
+        width: 150px;
+        text-align: center;
+        text-decoration: none;
+        cursor: pointer;
+        padding: 5px 0px;
+        border-radius: 5px;
+        font-weight: 500;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .Choicefile:hover {
+        text-decoration: none;
+        color: white;
+    }
+
+    #uploadfile,
+    .removeimg {
+        display: none;
+    }
+
+    #thumbbox {
+        position: relative;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .removeimg {
+        height: 25px;
+        position: absolute;
+        background-repeat: no-repeat;
+        top: 5px;
+        left: 5px;
+        background-size: 25px;
+        width: 25px;
+        /* border: 3px solid red; */
+        border-radius: 50%;
+
+    }
+
+    .removeimg::before {
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        content: '';
+        border: 1px solid red;
+        background: red;
+        text-align: center;
+        display: block;
+        margin-top: 11px;
+        transform: rotate(45deg);
+    }
+
+    .removeimg::after {
+        /* color: #FFF; */
+        /* background-color: #DC403B; */
+        content: '';
+        background: red;
+        border: 1px solid red;
+        text-align: center;
+        display: block;
+        transform: rotate(-45deg);
+        margin-top: -2px;
+    }
+</style>
+<!-- Navbar-->
+<div th:replace="~{navbar-layout :: navbar-admin}"></div>
+<main class="app-content">
+    <div class="app-title">
+        <ul class="app-breadcrumb breadcrumb">
+            <li class="breadcrumb-item">Thêm giảm giá</li>
+            <li class="breadcrumb-item">Cập nhật giảm giá</li>
+        </ul>
+        <div id="clock"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tile">
+                <h3 class="tile-title" th:if="${sale.id == 0}">Tạo đợt giảm giá mới</h3>
+                <h3 class="tile-title" th:if="${sale.id != 0}">Cập nhật đợt giảm giá</h3>
+                <div class="tile-body">
+                    <form action="/manage-sale/save" method="post" th:object="${sale}" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="form-group col-md-3">
+                                <label class="control-label">Tên giảm giá</label>
+                                <input class="form-control" type="text" name="name" th:value="*{name}" required onchange="validateText(this,'messName','Tên')">
+                                <p id="messName"></p>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label class="control-label">Giá trị(%)</label>
+                                <input class="form-control" type="number" name="discount" th:value="*{discount}" required onchange="validateDiscount(this)">
+                                <p id="messDiscount"></p>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label class="control-label">Ngày bắt đầu</label>
+                                <input class="form-control" id="startDate" type="date" name="startDate" th:value="*{startDate}" required onchange="validateStartDate()" th:readonly="${sale.id != 0}">
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label class="control-label">Ngày kết thúc</label>
+                                <input class="form-control" id="endDate" type="date" name="endDate" th:value="*{endDate}" required onchange="validateEndDate()">
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label class="control-label">Hình ảnh</label>
+                                <div>
+                                    <input type="file" name="mainImageFile" id="mainImageInput"
+                                           accept="image/*" oninput="mainIm(this)" th:required="${sale.id == 0}"/>
+                                    <div class="preview" id="mainPreview">
+                                        <img th:src="${sale.image}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" th:if="*{id != 0}"  name="id" th:value="*{id}">
+                        <button class="btn btn-save" type="submit">Lưu lại</button>
+                        <a class="btn btn-cancel" href="/manage-sale/listSale">Hủy bỏ</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="/js/jquery-3.2.1.min.js"></script>
+<script src="/js/popper.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/mainSA.js"></script>
+<script src="/js/plugins/pace.min.js"></script>
+
+</body>
+
+</html>

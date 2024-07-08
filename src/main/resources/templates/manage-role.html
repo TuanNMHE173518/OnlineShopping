@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Danh sách Role | Quản trị Admin</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Main CSS-->
+    <link rel="stylesheet" type="text/css" href="/css/mainSA.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+    <!-- or -->
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@latest/css/boxicons.min.css">
+
+    <!-- Font-icon css-->
+    <link rel="stylesheet" type="text/css"
+          href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
+
+    <style>
+        .custom-button {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-weight: 600;
+            color: #333333;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .custom-button:hover {
+            color: #10aea0;
+        }
+
+    </style>
+</head>
+
+<body onload="time()" class="app sidebar-mini rtl">
+<!-- Navbar-->
+<header th:insert="~{navbar-layout :: navbar-admin}"></header>
+<main class="app-content">
+    <div class="app-title">
+        <ul class="app-breadcrumb breadcrumb side">
+            <li class="breadcrumb-item active"><a href="/admin/manage-role"><b>Danh sách vai trò</b></a></li>
+        </ul>
+        <div id="clock"></div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tile">
+                <div class="tile-body">
+                    <div class="col-sm-2">
+                        <button class="btn btn-add btn-sm"
+                                id="add-role"
+                                title="Thêm"
+                                data-toggle="modal"
+                                data-target="#ModalAdd"
+                        >
+                            <i class="fas fa-plus"></i>
+                            Tạo vai trò mới</button>
+                    </div>
+
+                    <h5 class="mb-3 ml-1 mt-3 custom-font">Nhấn vào vai trò để xem các quyền!</h5>
+                    <form action="/admin/delete" method="post" id="form-delete">
+
+                        <div class="accordion" id="accordionExample">
+                            <div class="card" th:each="role : ${roles}">
+                                <input type="hidden" class="role-default" th:id="'role-default' + ${role.id}" th:value="${role.name}">
+                                <input type="hidden" id="username" th:value="${#authentication.getName()}">
+                                <div class="card-header" th:id="'heading' + ${role.id}">
+                                    <div class="accordion-header d-flex justify-content-between align-items-center">
+                                        <button class="btn btn-link custom-button" type="button" data-toggle="collapse" th:data-target="'#collapse' + ${role.id}" aria-expanded="true" th:aria-controls="'collapse' + ${role.id}" th:text="${role.name.substring(5) +' ('+role.description+')'}">
+                                        </button>
+                                        <div>
+                                            <button class="btn btn-primary btn-sm edit"
+                                                    type="button"
+                                                    title="Sửa"
+                                                    id="show-emp"
+                                                    data-toggle="modal"
+                                                    data-target="#ModalUP"
+                                                    th:data-role-id="${role.id}"
+                                                    th:data-role-name="${role.name.substring(5)}"
+                                                    th:data-role-des="${role.description}"
+                                            >
+                                                <input type="hidden" th:each="p : ${role.getPermissions()}" th:id="'role_permission' + ${role.id}" th:value="${p.id}">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-danger btn-sm trash ml-2"
+                                                    type="button"
+                                                    title="Xóa"
+                                                    th:data-role-id="${role.id}"
+                                                    th:data-role-name="${role.name.substring(5)}"
+                                                    onclick="deleteRole(this.dataset.roleId, this.dataset.roleName)">
+                                                <i class="fas fa-trash-alt"></i>
+
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div th:id="'collapse' + ${role.id}" class="collapse" th:classappend="${role.id == 0} ? ' show'" th:aria-labelledby="'heading' + ${role.id}" data-parent="#accordionExample">
+                                    <div class="card-body">
+                                        <ul class="list-group">
+                                            <li class="list-group-item custom-font" th:each="permission : ${role.permissions}">
+                                                <span><i class="fas fa-check-circle text-success"></i></span>
+                                                <span th:text="${permission.name + ' - ' + permission.description}"></span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!--
+MODAL
+-->
+<div  class="modal fade" id="ModalUP" tabindex="-1" role="dialog" aria-hidden="true"
+      data-backdrop="static"
+      data-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <form th:action="@{/admin/manage-role/update}" method="post">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group  col-md-12">
+                        <span class="thong-tin-thanh-toan">
+                            <h5>Chỉnh sửa quyền hạn</h5>
+                        </span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label class="control-label">ID</label>
+                            <input class="form-control" type="text" id="role-id" name="role-id" readonly>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label class="control-label">Tên</label>
+                            <input class="form-control" type="text"  id="role-name" name="role-name">
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="control-label">Mô tả</label>
+                            <input class="form-control" type="text"  id="role-des" name="role-des">
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="control-label">Quyền hạn</label>
+                            <div th:each="p : ${permissions}">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" th:value="${p.id}" name="role-permission" th:id="${p.id}">
+                                    <label class="form-check-label" th:for="${p.id}" th:text="${p.name + ' - ' + p.description}"></label>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <BR>
+                    <button class="btn btn-save" type="submit">Lưu lại</button>
+                    <a class="btn btn-cancel" data-dismiss="modal" href="#">Hủy bỏ</a>
+                    <BR>
+                </div>
+            </form>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div  class="modal fade" id="ModalAdd" tabindex="-1" role="dialog" aria-hidden="true"
+      data-backdrop="static"
+      data-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <form id="form-add-role" th:action="@{/admin/manage-role/add}" method="post">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group  col-md-12">
+                        <span class="thong-tin-thanh-toan">
+                            <h5>Thêm vai trò mới</h5>
+                        </span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+
+                        <div class="form-group col-md-6">
+                            <label class="control-label">Tên</label>
+                            <input class="form-control" type="text" id="role-name-add" name="role-name-add">
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="control-label">Mô tả</label>
+                            <input class="form-control" type="text" id="role-des-add" name="role-des-add">
+                        </div>
+                        <div class="form-group  col-md-6">
+                            <label class="control-label">Quyền hạn</label>
+                            <div th:each="p : ${permissions}">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" th:value="${p.id}" name="role-permission" th:id="${p.id}">
+                                    <label class="form-check-label" th:for="${p.id}" th:text="${p.name}"></label>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <BR>
+                    <button class="btn btn-save" type="submit">Lưu lại</button>
+                    <a class="btn btn-cancel" data-dismiss="modal" href="#">Hủy bỏ</a>
+                    <BR>
+                </div>
+            </form>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+<!--
+MODAL
+-->
+
+<!-- Essential javascripts for application to work-->
+<script src="/js/jquery-3.2.1.min.js"></script>
+<script src="/js/popper.min.js"></script>
+<script src="/js/bootstrapSA.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="src/jquery.table2excel.js"></script>
+<script src="/js/mainSA.js"></script>
+<!-- The javascript plugin to display page loading on top-->
+<script src="/js/plugins/pace.min.js"></script>
+<!-- Page specific javascripts-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+<!-- Data table plugin-->
+<script type="text/javascript" src="/js/plugins/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/js/plugins/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript">
+
+    $('#sampleTable').DataTable({
+        info: true,
+        paging: true,
+        searching: true,
+    });
+
+</script>
+<script>
+
+
+    document.getElementById("form-add-role").addEventListener("submit", function(event) {
+        var newRoleName = document.getElementById("role-name-add").value.trim();
+        document.querySelectorAll('.role-default').forEach((input) =>{
+            if (('ROLE_' + newRoleName) === input.value){
+                event.preventDefault();
+                swal("Tên vai trò đã tồn tại, vui lòng chọn tên khác.");
+            }
+        })
+
+    });
+
+    function deleteRole(roleid, roleName) {
+        swal({
+            title: "Cảnh báo",
+            text: "Bạn có chắc chắn là muốn xóa vai trò này?",
+            buttons: ["Hủy bỏ", "Đồng ý"],
+        })
+            .then((willDelete) => {
+                if (!willDelete) {
+                    return;
+                }
+                if (roleName === 'ADMIN'){
+                    swal({
+                        title: "Cảnh báo",
+                        text: "Bạn không thể xóa vai trò này, vì nó là vai trò mặc định!",
+                        buttons: {
+                            close: "Đóng",
+                        },
+                    });
+                }
+                else {
+
+                    swal("Đã xóa thành công!").then(() => {
+                        window.location.href = "/admin/manage-role/delete?role-id=" + roleid;
+                    });
+                }
+            });
+    }
+
+
+    function time() {
+        var today = new Date();
+        var weekday = new Array(7);
+        weekday[0] = "Chủ Nhật";
+        weekday[1] = "Thứ Hai";
+        weekday[2] = "Thứ Ba";
+        weekday[3] = "Thứ Tư";
+        weekday[4] = "Thứ Năm";
+        weekday[5] = "Thứ Sáu";
+        weekday[6] = "Thứ Bảy";
+        var day = weekday[today.getDay()];
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1;
+        var yyyy = today.getFullYear();
+        var h = today.getHours();
+        var m = today.getMinutes();
+        var s = today.getSeconds();
+        m = checkTime(m);
+        s = checkTime(s);
+        nowTime = h + " giờ " + m + " phút " + s + " giây";
+        if (dd < 10) {
+            dd = '0' + dd
+        }
+        if (mm < 10) {
+            mm = '0' + mm
+        }
+        today = day + ', ' + dd + '/' + mm + '/' + yyyy;
+        tmp = '<span class="date"> ' + today + ' - ' + nowTime +
+            '</span>';
+        document.getElementById("clock").innerHTML = tmp;
+        clocktime = setTimeout("time()", "1000", "Javascript");
+
+        function checkTime(i) {
+            if (i < 10) {
+                i = "0" + i;
+            }
+            return i;
+        }
+    }
+
+
+    document.querySelectorAll('.edit').forEach(function (button) {
+        button.addEventListener('click', function () {
+            var role_id = button.getAttribute("data-role-id");
+            var role_name = button.getAttribute("data-role-name");
+            var role_des = button.getAttribute("data-role-des");
+            var permissions = [];
+            var InputPermission = document.querySelectorAll('#role_permission'+ role_id);
+            InputPermission.forEach((input) => {
+                permissions.push(input.value);
+            })
+
+
+            var modal = document.getElementById('ModalUP');
+
+            modal.querySelector('#role-id').value = '# '+role_id;
+            modal.querySelector('#role-name').value = role_name;
+            modal.querySelector('#role-des').value = role_des;
+            modal.querySelectorAll('.form-check-input').forEach((checkbox) =>{
+                var checkId = checkbox.id;
+                if (permissions.includes(checkId)){
+                    checkbox.checked = true;
+                }else{
+                    checkbox.checked = false;
+                }
+            });
+
+            var username = document.getElementById('username').value;
+
+            if (role_name.toUpperCase() === 'ADMIN' && username !== 'Admin123') {
+                console.log(username);
+                modal.querySelectorAll('.form-check-input').forEach((checkbox) => {
+                    if (checkbox.nextElementSibling.textContent.includes('MANAGE_PERMISSION') || checkbox.nextElementSibling.textContent.includes('ACCOUNT_PERMISSION') ||checkbox.nextElementSibling.textContent.includes('MANAGE_ROLE_PERMISSION')){
+                        checkbox.disabled = true;
+                    }
+
+                });
+            }
+        })
+    });
+
+    $("#show-emp").on("click", function () {
+        var username = document.getElementById('username').value;
+        console.log(username);
+        if (username !== 'Admin123') {
+            swal({
+                title: "Cảnh báo",
+                text: "Bạn không có quyền truy cập chức năng này!",
+                icon: "warning",
+                button: "Đóng",
+            });
+            return;
+        }
+        $("#ModalUP").modal({backdrop: false, keyboard: false});
+    });
+
+    $("#add-role").on("click", () =>{
+
+        $("#ModalAdd").modal({backdrop: false, keyboard:false})
+    });
+
+</script>
+</body>
+
+</html>

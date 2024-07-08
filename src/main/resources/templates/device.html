@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html class="no-js" lang="zxx" xmlns:th="http://www.thymeleaf.org"
+xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<!-- Mirrored from demo.graygrids.com/themes/shopgrids/device.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 22 May 2024 15:33:41 GMT -->
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <title>Shop Grid - ShopGrids Bootstrap 5 eCommerce HTML Template.</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.svg" />
+
+    <!-- ========================= CSS here ========================= -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/LineIcons.3.0.css" />
+    <link rel="stylesheet" href="/css/tiny-slider.css" />
+    <link rel="stylesheet" href="/css/glightbox.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <style>
+        .product-image img{
+            width: 288px;
+            height: 224px;
+            object-fit: cover;
+        }
+    </style>
+</head>
+
+<body>
+    <!--[if lte IE 9]>
+      <p class="browserupgrade">
+        You are using an <strong>outdated</strong> browser. Please
+        <a href="https://browsehappy.com/">upgrade your browser</a> to improve
+        your experience and security.
+      </p>
+    <![endif]-->
+
+    <!-- Preloader -->
+    <div class="preloader">
+        <div class="preloader-inner">
+            <div class="preloader-icon">
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+    <!-- /End Preloader -->
+
+<div th:replace="~{header-layout :: header}"></div>
+
+    <!-- Start Breadcrumbs -->
+    <div class="breadcrumbs">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 col-md-6 col-12">
+                    <div class="breadcrumbs-content">
+                        <h1 class="page-title">Shop Grid</h1>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6 col-12">
+                    <ul class="breadcrumb-nav">
+                        <li><a href="index-2.html"><i class="lni lni-home"></i> Home</a></li>
+                        <li><a href="javascript:void(0)">Shop</a></li>
+                        <li>Shop Grid</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Breadcrumbs -->
+    <!-- Start Product Grids -->
+    <section class="product-grids section">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+
+                    <div class="product-grids-head">
+                        <div class="product-grid-topbar">
+                            <div class="row align-items-center">
+                                <form th:action="@{/devices/{id}(id=${typeDeviceId})}" method="get">
+                                <div class="col-lg-7 col-md-8 col-12">
+                                    <div class="product-sorting">
+                                        <label for="sorting">Sắp xếp theo:</label>
+                                        <select name="sort" class="form-control" id="sorting" onchange="this.form.submit()">
+                                            <option th:selected="${sort == 'nameAsc'}" value="nameAsc"> Sắp xếp từ A - Z </option>
+                                            <option th:selected="${sort == 'nameDesc'}" value="nameDesc"> Sắp xếp từ Z - A </option>
+                                            <option th:selected="${sort == 'priceAsc'}" value="priceAsc">Giá thấp - cao</option>
+                                            <option th:selected="${sort == 'priceDesc'}" value="priceDesc">Giá cao - thấp</option>
+                                        </select>
+                                        <input name="page"  type="hidden"/>
+                                        <h3 class="total-show-product">Hiển thị: <span>1 - 12 items</span></h3>
+                                    </div>
+                                </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="tab-content" id="nav-tabContent">
+                                <div class="row">
+                                    <div  th:each="device : ${deviceList}" class="col-lg-3 col-md-6 col-12">
+                                        <!-- Start Single Product -->
+                                        <div class="single-product">
+                                            <div class="product-image">
+                                                <img th:src="${device.mainImage}" alt="#">
+                                                <div class="button">
+                                                    <a th:href="'/deviceDetail/'+${device.id}" class="btn">Xem chi tiết</a>
+                                                </div>
+                                            </div>
+                                            <div class="product-info">
+                                                <span class="category" th:text="${device.typeDevice.name}"></span>
+                                                <h4 class="title">
+                                                    <a th:href="'/deviceDetail/'+${device.id}" th:text="${device.name}"></a>
+                                                </h4>
+                                                <div class="price">
+                                                    <span th:text="${device.formatPrice(device.price)}"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- End Single Product -->
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <!-- Pagination -->
+                                        <div class="pagination left">
+                                            <ul class="pagination-list">
+                                                <li th:each="i : ${#numbers.sequence(1, totalPage)}" th:class="${page == i} ? 'active' : ''">
+                                                    <a th:href="@{/devices/{id}(id=${typeDeviceId}, sort=${sort}, page=${i})}"
+                                                       th:text="${i}"></a>
+                                                </li>
+                                                <li th:if="${page < totalPage}">
+                                                    <a th:href="@{/devices/{id}(id=${typeDeviceId}, sort=${sort}, page=${page + 1})}">
+                                                        <i class="lni lni-chevron-right"></i>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <!--/ End Pagination -->
+                                    </div>
+                                </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- End Product Grids -->
+
+    <!-- Start Footer Area -->
+    <div th:replace="~{footer-layout :: footer}"></div>
+    <!--/ End Footer Area -->
+
+    <!-- ========================= scroll-top ========================= -->
+    <a href="#" class="scroll-top">
+        <i class="lni lni-chevron-up"></i>
+    </a>
+
+    <!-- ========================= JS here ========================= -->
+
+    </script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/tiny-slider.js"></script>
+    <script src="/js/glightbox.min.js"></script>
+    <script src="/js/main.js"></script>
+</body>
+
+
+<!-- Mirrored from demo.graygrids.com/themes/shopgrids/device.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 22 May 2024 15:33:41 GMT -->
+</html>

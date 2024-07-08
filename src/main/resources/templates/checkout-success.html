@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html class="no-js" lang="zxx"
+      xmlns:th="http://www.thymeleaf.org"
+>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <title th:if="${!error.isEmpty()}">Thanh toán thành công - iTech Heaven.</title>
+    <title th:if="${error.isEmpty()}">Lỗi - iTech Heaven.</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.svg" />
+
+    <!-- ========================= CSS here ========================= -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/LineIcons.3.0.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+
+</head>
+
+<body>
+
+<!-- Preloader -->
+<div class="preloader">
+    <div class="preloader-inner">
+        <div class="preloader-icon">
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+</div>
+<!-- /End Preloader -->
+
+<!-- Start Error Area -->
+<div class="error-area">
+    <div class="d-table">
+        <div class="d-table-cell">
+            <div class="container">
+                <div class="error-content">
+                    <h1 th:if="${error.isEmpty()}">Thanh toán thành công</h1>
+                    <h2 th:if="${error.isEmpty()}">Chúng tôi đang chuẩn bị hàng, hãy kiểm tra email hoặc số điện thoại để nhận được thông báo về đơn hàng!</h2>
+                    <h1 th:if="${!error.isEmpty()}">Lỗi</h1>
+                    <h2 th:if="${!error.isEmpty()}">Có vấn đề xảy ra trong quá trình thanh toán!</h2>
+
+
+                    <p id="error-message" th:if="${!error.isEmpty()}" th:text="${error}" class="fs-6 fw-normal text-center text-secondary m-0 px-md-5 error-message text-center mt-3 alert alert-danger"></p>
+
+
+                    <div class="button mt-3">
+                        <a href="/cart" class="btn">Quay về giỏ hàng</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Error Area -->
+
+<!-- ========================= JS here ========================= -->
+<script src="/js/bootstrap.min.js"></script>
+<script>
+    window.onload = function () {
+        window.setTimeout(fadeout, 500);
+    }
+
+    function fadeout() {
+        document.querySelector('.preloader').style.opacity = '0';
+        document.querySelector('.preloader').style.display = 'none';
+    }
+</script>
+</body>
+
+</html>

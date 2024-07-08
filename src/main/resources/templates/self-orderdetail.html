@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      class="no-js"
+      lang="zxx">
+
+
+
+<!-- Mirrored from demo.graygrids.com/themes/shopgrids/contact.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 22 May 2024 15:33:36 GMT -->
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <title>Chi tiết đơn hàng  - iTech Heaven.</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.svg" />
+
+    <!-- ========================= CSS here ========================= -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/LineIcons.3.0.css" />
+    <link rel="stylesheet" href="/css/tiny-slider.css" />
+    <link rel="stylesheet" href="/css/glightbox.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap5.min.css">
+    <style>
+
+        label{
+            padding: 8px;
+            border-radius: 10px;
+            border: 1px solid #b3b2b2;
+            background-color: #e4e4e4;
+            color: #272729;
+            font-size: 16px;
+        }
+        .dataTables_wrapper .dataTables_filter input {
+            border-radius: 0.375rem; /* Rounded corners for search input */
+            padding: 0.375rem 0.75rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            border-radius: 0.375rem;
+            margin: 0 0.25rem;
+            background: #a0d5d5;
+            color: white;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: #0056b3;
+        }
+
+        .dataTables_wrapper .dataTables_info {
+            margin-top: 0.5rem;
+            color: #6c757d;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .dataTables_wrapper .dataTables_length select {
+            border-radius: 0.375rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        table.dataTable thead {
+            background-color: #d1b4be;
+            color: black;
+        }
+
+        table.dataTable thead th {
+            border: 1px solid #dee2e6;
+            padding: 0.75rem;
+        }
+
+        table.dataTable tbody tr {
+            border: 1px solid #dee2e6;
+        }
+
+        table.dataTable tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        table.dataTable tbody td {
+            padding: 0.75rem;
+        }
+
+        .table-container {
+            background: #f8f9fa; /* Light gray background */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Soft shadow */
+        }
+    </style>
+
+</head>
+
+<body>
+<!--[if lte IE 9]>
+<p class="browserupgrade">
+    You are using an <strong>outdated</strong> browser. Please
+    <a href="https://browsehappy.com/">upgrade your browser</a> to improve
+    your experience and security.
+</p>
+<![endif]-->
+
+<!-- Preloader -->
+<div class="preloader">
+    <div class="preloader-inner">
+        <div class="preloader-icon">
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+</div>
+<!-- /End Preloader -->
+
+<!-- Start Header Area -->
+<header th:insert="~{header-layout :: header}"></header>
+<!-- End Header Area -->
+
+<!-- Start Breadcrumbs -->
+<div class="breadcrumbs">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 col-md-6 col-12">
+                <div class="breadcrumbs-content">
+                    <h1 class="page-title">Chi tiết đơn hàng</h1>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-12">
+                <ul class="breadcrumb-nav">
+                    <li><a href="/home"><i class="lni lni-home"></i>Home</a></li>
+                    <li>Chi tiết đơn hàng</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Breadcrumbs -->
+
+<!-- Start Contact Area -->
+<section id="contact-us" class="contact-us section">
+    <div class="container">
+        <div class="contact-head">
+            <div class="row">
+                <div class="col-12">
+                    <div class="section-title">
+                        <h2>Chi tiết đơn hàng</h2>
+
+                        <a href="/contact" class="fw-bold fs-5">Nếu bạn thắc mắc hãy liên hệ với chúng tôi tại đây! </a>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="tile">
+                        <div class="tile-body table-container">
+                            <table class="table table-hover table-bordered" id="sampleTable">
+                                <thead>
+                                <tr>
+                                    <th>ID đơn hàng</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Hình ảnh</th>
+                                    <th>Màu sắc</th>
+                                    <th>Bộ nhớ</th>
+                                    <th>Số lượng</th>
+                                    <th>Giá bán</th>
+                                    <th>Loại sản phẩm</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="detail : ${listDetail}">
+                                    <td th:text="${detail.order.id}"></td>
+                                    <td >
+                                        <a th:text="${detail.device != null ? detail.device.name : detail.accessory.name}"  th:if="${detail.device!=null}" th:href="@{/deviceDetail/{deviceId}(deviceId=${detail.device.id})}"></a>
+                                        <a th:text="${detail.device != null ? detail.device.name : detail.accessory.name}"  th:if="${detail.accessory!=null}" th:href="@{/accessoryDetail/{accessoryId}(accessoryId = ${detail.accessory.id})}"></a>
+                                    </td>
+
+                                    <td>
+                                        <a th:if="${detail.device!=null}" th:href="@{/deviceDetail/{deviceId}(deviceId=${detail.device.id})}">
+                                            <img th:src="${detail.device != null ? detail.device.mainImage : detail.accessory.mainImage}" alt="" width="80px;">
+
+                                        </a>
+                                        <a  th:if="${detail.accessory!=null}" th:href="@{/accessoryDetail/{accessoryId}(accessoryId = ${detail.accessory.id})}">
+                                            <img th:src="${detail.device != null ? detail.device.mainImage : detail.accessory.mainImage}" alt="" width="80px;">
+
+                                        </a>
+
+                                    </td>
+                                    <td th:text="${detail.device != null ? detail.device.colorName : detail.accessory.colorName}"></td>
+                                    <td th:text="${detail.device != null ? detail.device.ROM : ''}"></td>
+                                    <td th:text="${detail.quantity}"></td>
+                                    <td th:text="${detail.formatPrice()}"></td>
+                                    <td th:text="${detail.productType.name().equalsIgnoreCase('device')?'Thiết bị':'Phụ kiện'}"></td>
+                                </tr>
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <th th:text="'Tổng tiền: '+${order.formatPrice()}" colspan="2"></th>
+                                    <th th:text="'Tên khách hàng: ' + ${order.getUser().getLastname()}" colspan="2"></th>
+                                    <th th:text="'Ngày đặt hàng: ' + ${order.formatDate()}" colspan="2"></th>
+                                    <th></th>
+
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!--/ End Contact Area -->
+
+<!-- Start Footer Area -->
+<footer th:insert="~{footer-layout :: footer}"></footer>
+<!--/ End Footer Area -->
+
+<!-- ========================= scroll-top ========================= -->
+<a href="#" class="scroll-top">
+    <i class="lni lni-chevron-up"></i>
+</a>
+
+<!-- ========================= JS here ========================= -->
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/tiny-slider.js"></script>
+<script src="/js/glightbox.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/jquery-3.2.1.min.js"></script>
+<script src="/js/jquery-3.2.1.min.js"></script>
+<script src="/js/popper.min.js"></script>
+<script src="/js/bootstrapSA.min.js"></script>
+<script type="text/javascript" src="/js/plugins/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="/js/plugins/dataTables.bootstrap.min.js"></script>
+<script type="text/javascript">$('#sampleTable').DataTable();</script>
+
+</body>
+
+
+<!-- Mirrored from demo.graygrids.com/themes/shopgrids/contact.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 22 May 2024 15:33:36 GMT -->
+</html>

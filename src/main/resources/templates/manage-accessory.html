@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Danh sách phụ kiện | Quản trị Admin</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Main CSS-->
+    <link rel="stylesheet" type="text/css" href="/css/mainSA.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+    <!-- or -->
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@latest/css/boxicons.min.css">
+
+    <!-- Font-icon css-->
+    <link rel="stylesheet" type="text/css"
+          href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
+
+</head>
+
+<body onload="time()" class="app sidebar-mini rtl">
+<!-- Navbar-->
+<div th:replace="~{navbar-layout :: navbar-admin}"></div>
+<main class="app-content">
+    <div class="app-title">
+        <ul class="app-breadcrumb breadcrumb side">
+            <li class="breadcrumb-item active"><a href="#"><b>Danh sách phụ kiện</b></a></li>
+        </ul>
+        <div id="clock"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tile">
+                <div class="tile-body">
+                    <div class="row element-button">
+                        <div class="col-sm-2">
+                            <a class="btn btn-add btn-sm" href="/manage-accessory/form-add-accessory" title="Thêm"><i
+                                    class="fas fa-plus"></i>
+                                Tạo phụ kiện mới</a>
+                        </div>
+                    </div>
+                    <div
+                            id="sampleTable_wrapper"
+                            class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer"
+                    >
+                        <div class="row">
+                            <div class="col-sm-12 col-md-3">
+                                <div class="dataTables_length" id="sampleTable_length1">
+                                    <label
+                                    >Danh mục phụ kiện
+                                        <select
+                                                name="sampleTable_length"
+                                                id="typeAccessory"
+                                                aria-controls="sampleTable"
+                                                class="form-control form-control-sm"
+                                                onchange="selectType()"
+                                                style="width: fit-content"
+                                        >
+                                            <option th:value="0" th:selected="${accessoryCatId == 0}">Tất cả</option>
+                                            <option th:each="accessoryCategory : ${accessoryCategories}"
+                                                    th:value="${accessoryCategory.id}"
+                                                    th:text="${accessoryCategory.name}"
+                                                    th:selected="${accessoryCatId == accessoryCategory.id}"></option>\
+                                        </select>
+                                    </label
+                                    >
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-3">
+                                <div class="dataTables_length" id="sampleTable_length">
+                                    <label
+                                    >Thiết bị tương thích
+                                        <select
+                                                name="sampleTable_length"
+                                                id="typeDevice"
+                                                aria-controls="sampleTable"
+                                                class="form-control form-control-sm"
+                                                onchange="selectType()"
+                                                style="width: fit-content"
+                                        >
+                                            <option th:value="0" th:selected="${typeDeviceId == 0}">Tất cả</option>
+                                            <option th:each="typeDevice : ${typeDeviceList}"
+                                                    th:value="${typeDevice.id}"
+                                                    th:text="${typeDevice.name}"
+                                                    th:selected="${typeDeviceId == typeDevice.id}"></option>\
+                                        </select>
+                                    </label
+                                    >
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-6">
+                                <div id="sampleTable_filter" class="dataTables_filter">
+                                    <form action="/manage-accessory/search" method="post">
+                                        <label>
+                                            <input id="search"
+                                                   type="search"
+                                                   name="accessoryName"
+                                                   th:value="${accessoryName}"
+                                                   class="form-control form-control-sm"
+                                                   placeholder="Tìm theo tên phụ kiện"
+                                                   aria-controls="sampleTable"/>
+                                            <input type="hidden" name="accessoryCatId" th:value="${accessoryCatId}">
+                                            <input type="hidden" name="typeDeviceId" th:value="${typeDeviceId}">
+                                            <input type="submit" value="Tìm kiếm"/>
+                                        </label>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table class="table table-hover table-bordered" id="sampleTable">
+                                    <thead>
+                                    <tr>
+                                        <th>Mã phụ kiện</th>
+                                        <th>Tên phụ kiện</th>
+                                        <th>Ảnh</th>
+                                        <th>Màu sắc</th>
+                                        <th>Số lượng</th>
+                                        <th>Giá tiền</th>
+                                        <th>Giá khuyến mãi</th>
+                                        <th>Chức năng</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:if="${accessoryList.isEmpty()}">
+                                        <td id="Notfound" colspan="7">Không có thiết bị nào</td>
+                                    </tr>
+                                    <tr th:each="accessory : ${accessoryList}">
+                                        <td th:text="${accessory.id}"></td>
+                                        <td th:text="${accessory.name}"></td>
+                                        <td><img th:src="${accessory.mainImage}" alt="" width="80px;"></td>
+                                        <td th:text="${accessory.colorName}"></td>
+                                        <td th:text="${accessory.quantity}"></td>
+                                        <td th:text="${accessory.formatPrice(accessory.price)}"></td>
+                                        <td th:if="${accessory.sale != null}" th:text="${accessory.formatPrice(accessory.getSalePrice())}"></td>
+                                        <td th:if="${accessory.sale == null}"></td>
+                                        <td>
+                                            <button class="btn btn-primary btn-sm trash" type="button" title="Xóa"
+                                                    th:onclick="|deletionNotice(document.getElementById('notice'),document.getElementById('agree'),'/manage-accessory/delete/${accessory.id}')|"><i class="fas fa-trash-alt"></i>
+                                            </button>
+                                            <button class="btn btn-primary btn-sm edit" type="button" title="Sửa"
+                                                    id="show-emp"
+                                                    data-toggle="modal"
+                                                    data-target="#ModalUP"
+                                                    th:onclick="|window.location='/manage-accessory/update/${accessory.id}'|"
+                                            ><i class="fas fa-edit"></i></button>
+
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!--
+  MODAL
+-->
+<div class="swal-overlay" tabindex="-1" id="notice">
+    <div class="swal-modal" role="dialog" aria-modal="true">
+        <div class="swal-title" style="">Cảnh báo</div>
+        <div class="swal-text" style="">Bạn có chắc chắn là muốn xóa sản phẩm này?</div>
+        <div class="swal-footer">
+            <div class="swal-button-container">
+
+                <button class="swal-button swal-button--cancel"
+                        onclick="deletionNotice(document.getElementById('notice'))">Hủy bỏ
+                </button>
+
+                <div class="swal-button__loader">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+
+            </div>
+            <div class="swal-button-container">
+
+                <button class="swal-button swal-button--confirm" id="agree">Đồng ý</button>
+
+                <div class="swal-button__loader">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function selectType() {
+        var typeDeviceId = document.getElementById('typeDevice').value;
+        var typeAccessoryId = document.getElementById('typeAccessory').value;
+        var accessoryName = document.getElementById('search').value;
+        if(accessoryName !== ''){
+            window.location = '/manage-accessory/search/' + typeAccessoryId + '/' + typeDeviceId + '/' + accessoryName;
+        }
+        else{
+            window.location = '/manage-accessory/search/' + typeAccessoryId + '/' + typeDeviceId;
+        }
+    }
+</script>
+<!-- Essential javascripts for application to work-->
+<script src="/js/jquery-3.2.1.min.js"></script>
+<script src="/js/popper.min.js"></script>
+<script src="/js/bootstrapSA.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="src/jquery.table2excel.js"></script>
+<script src="/js/mainSA.js"></script>
+<!-- The javascript plugin to display page loading on top-->
+<script src="/js/plugins/pace.min.js"></script>
+<!-- Page specific javascripts-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+
+</body>
+
+</html>

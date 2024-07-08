@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form id="paymentForm" th:action="@{/payment/create}" method="post">
+    <input type="hidden" id="amount" name="amount" th:value="${amount}">
+<script type="text/javascript">
+    document.getElementById("paymentForm").submit();
+</script>
+</body>
+</html>

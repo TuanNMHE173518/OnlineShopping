@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Thêm sản phẩm | Quản trị Admin</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Main CSS-->
+    <link rel="stylesheet" type="text/css" href="/css/mainSA.css">
+    <!-- Font-icon css-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+    <!-- or -->
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@latest/css/boxicons.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script type="text/javascript" src="/ckeditor/ckeditor.js"></script>
+    <script src="http://code.jquery.com/jquery.min.js" type="text/javascript"></script>
+
+</head>
+
+<body onload="time()" class="app sidebar-mini rtl">
+<style>
+    .Choicefile {
+        display: block;
+        background: #14142B;
+        border: 1px solid #fff;
+        color: #fff;
+        width: 150px;
+        text-align: center;
+        text-decoration: none;
+        cursor: pointer;
+        padding: 5px 0px;
+        border-radius: 5px;
+        font-weight: 500;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .Choicefile:hover {
+        text-decoration: none;
+        color: white;
+    }
+
+    #uploadfile,
+    .removeimg {
+        display: none;
+    }
+
+    #thumbbox {
+        position: relative;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .removeimg {
+        height: 25px;
+        position: absolute;
+        background-repeat: no-repeat;
+        top: 5px;
+        left: 5px;
+        background-size: 25px;
+        width: 25px;
+        /* border: 3px solid red; */
+        border-radius: 50%;
+
+    }
+
+    .removeimg::before {
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        content: '';
+        border: 1px solid red;
+        background: red;
+        text-align: center;
+        display: block;
+        margin-top: 11px;
+        transform: rotate(45deg);
+    }
+
+    .removeimg::after {
+        /* color: #FFF; */
+        /* background-color: #DC403B; */
+        content: '';
+        background: red;
+        border: 1px solid red;
+        text-align: center;
+        display: block;
+        transform: rotate(-45deg);
+        margin-top: -2px;
+    }
+</style>
+<!-- Navbar-->
+<div th:replace="~{navbar-layout :: navbar-admin}"></div>
+<main class="app-content">
+    <div class="app-title">
+        <ul class="app-breadcrumb breadcrumb">
+            <li class="breadcrumb-item">Thêm thiết bị</li>
+            <li class="breadcrumb-item">Thêm cập thiết bị</li>
+        </ul>
+        <div id="clock"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tile">
+                <h3 class="tile-title" th:if="${device.id == 0}">Tạo thiết bị mới</h3>
+                <h3 class="tile-title" th:if="${device.id != 0}">Cập nhật thiết bị</h3>
+                <div class="tile-body">
+                    <form action="/manage-device/save" method="post" enctype="multipart/form-data"
+                          th:object="${device}">
+                        <div class="row">
+                            <div class="form-group col-md-3">
+                                <label class="control-label">Tên sản phẩm </label>
+                                <input class="form-control" type="text" name="name" th:value="*{name}" required onchange="validateText(this,'messName','Tên')">
+                                <p id="messName"></p>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label class="control-label">Giá tiền</label>
+                                <input class="form-control" type="text" name="price" th:value="*{price}" required onchange="validateInput(this)">
+                                <p id="mess"></p>
+                            </div>
+
+                            <div class="form-group col-md-3">
+                                <label for="exampleSelect2" class="control-label">Danh mục</label>
+                                <select class="form-control" id="exampleSelect2" name="typeDevice">
+                                    <option th:each="type : ${typeDeviceList}"
+                                            th:value="${type.id}"
+                                            th:text="${type.name}"
+                                            th:if="${device.id != 0}"
+                                            th:selected="${device.typeDevice.id == type.id}"
+                                    ></option>
+                                    <option th:each="type : ${typeDeviceList}"
+                                            th:value="${type.id}"
+                                            th:text="${type.name}"
+                                            th:if="${device.id == 0}"
+                                    ></option>
+                                </select>
+                            </div>
+
+                            <div class="form-group col-md-3 ">
+                                <label for="exampleSelect3" class="control-label">Giảm giá</label>
+                                <select class="form-control" id="exampleSelect3" name="sale">
+                                    <option th:selected="${device.sale == null}" value="">Không có</option>
+                                    <option th:each="sa : ${saleList}" th:value="${sa.id}"
+                                            th:text="${sa.name}"
+                                            th:if="${device.sale == null}"
+                                    ></option>
+                                    <option th:each="sa : ${saleList}" th:value="${sa.id}"
+                                            th:text="${sa.name}"
+                                            th:if="${device.sale != null}"
+                                            th:selected="${device.sale.id == sa.id}"
+                                    ></option>
+                                </select>
+                            </div>
+
+                            <div class="form-group col-md-2">
+                                <label class="control-label">Loại màu sắc</label>
+                                <input class="form-control " type="text" name="colorName" th:value="*{colorName}" required onchange="validateText(this,'messColor','Màu')">
+                                <p id="messColor"></p>
+                            </div>
+
+                            <div class="form-group col-md-1">
+                                <label class="control-label">Màu sắc</label>
+                                <input class="form-control " type="color" name="color" th:value="*{color}" required >
+                            </div>
+
+                            <div class="form-group col-md-3">
+                                <label class="control-label">Số lượng</label>
+                                <input class="form-control " type="number" name="quantity" th:value="*{quantity}" required onchange="validateQuantity(this)">
+                                <p id="messQuantity"></p>
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label class="control-label">Mô tả</label>
+                                <input class="form-control" type="text" name="description" th:value="*{description}" required onchange="validateText(this,'messDescription','Mô tả')">
+                                <p id="messDescription"></p>
+                            </div>
+
+                            <div class="form-group col-md-12">
+                                <label class="control-label">Ảnh chính của thiết bị</label>
+                                <div>
+                                    <input type="file" name="mainImageFile" id="mainImageInput" multiple
+                                           accept="image/*" oninput="mainIm(this)" th:required="${device.id == 0}"/>
+                                    <div class="preview" id="mainPreview">
+                                        <img th:src="${device.mainImage}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group col-md-12">
+
+                                <label class="control-label">Ảnh phụ</label>
+                                <div>
+                                    <input type="file" name="extraImages" id="imageInput" multiple accept="image/*"
+                                           oninput="extraIm(this)" th:required="${device.id == 0}"/>
+                                    <div class="preview" id="preview">
+                                        <img th:each="deviceImage : ${device.deviceImages}"
+                                             th:src="${deviceImage.image}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="padding-left: 300px">
+                                <label class="control-label"
+                                       style=" display:block; text-align: center; font-size: 22px">Thông số kĩ
+                                    thuật</label>
+                                <table class="table table-hover table-bordered" id="sampleTable">
+                                    <thead>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <th style="font-size: 16px">Màn hình</th>
+                                        <td><input type="text" style="width: 500px" name="screen" th:value="*{screen}">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th style="font-size: 16px">Camera sau</th>
+                                        <td><input type="text" style="width: 500px" name="camera" th:value="*{camera}">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th style="font-size: 16px">Camera trước</th>
+                                        <td><input type="text" style="width: 500px" name="frontCamera"
+                                                   th:value="*{frontCamera}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th style="font-size: 16px">Hệ điều hành</th>
+                                        <td><input type="text" style="width: 500px" name="OS" th:value="*{OS}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th style="font-size: 16px">RAM</th>
+                                        <td><input type="text" style="width: 500px" name="RAM" th:value="*{RAM}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th style="font-size: 16px">Bộ nhớ trong</th>
+                                        <td><input type="text" style="width: 500px" name="ROM" th:value="*{ROM}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th style="font-size: 16px">CPU</th>
+                                        <td><input type="text" style="width: 500px" name="CPU" th:value="*{CPU}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th style="font-size: 16px">Dung lượng pin</th>
+                                        <td><input type="text" style="width: 500px" name="battery"
+                                                   th:value="*{battery}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th style="font-size: 16px">Thẻ sim</th>
+                                        <td><input type="text" style="width: 500px" name="SIM" th:value="*{SIM}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th style="font-size: 16px">GPU</th>
+                                        <td><input type="text" style="width: 500px" name="GPU" th:value="*{GPU}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th style="font-size: 16px">HDD</th>
+                                        <td><input type="text" style="width: 500px" name="HDD" th:value="*{HDD}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th style="font-size: 16px">Kích thước</th>
+                                        <td><input type="text" style="width: 500px" name="size" th:value="*{size}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th style="font-size: 16px">Cân nặng</th>
+                                        <td><input type="text" style="width: 500px" name="weight" th:value="*{weight}">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th style="font-size: 16px">Chất liệu</th>
+                                        <td><input type="text" style="width: 500px" name="material"
+                                                   th:value="*{material}"></td>
+                                    </tr>
+                                    <tr>
+                                        <th style="font-size: 16px">Xuất xứ</th>
+                                        <td><input type="text" style="width: 500px" name="origin" th:value="*{origin}">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th style="font-size: 16px">Ngày ra mắt</th>
+                                        <td><input type="date" style="width: 500px" name="dateRelease"
+                                                   th:value="*{dateRelease}"></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <input type="hidden" th:if="*{id != 0}" name="id" th:value="*{id}">
+                        <button class="btn btn-save" type="submit">Lưu lại</button>
+                        <a class="btn btn-cancel" href="/manage-device/listDevice">Hủy bỏ</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+<script src="/js/jquery-3.2.1.min.js"></script>
+<script src="/js/popper.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/mainSA.js"></script>
+<script src="/js/plugins/pace.min.js"></script>
+</body>
+
+</html>

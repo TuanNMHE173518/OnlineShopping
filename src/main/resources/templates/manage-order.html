@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Danh sách đơn hàng | Quản trị Admin</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Main CSS-->
+    <link rel="stylesheet" type="text/css" href="/css/mainSA.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+    <!-- or -->
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@latest/css/boxicons.min.css">
+
+    <!-- Font-icon css-->
+    <link rel="stylesheet" type="text/css"
+          href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
+
+</head>
+
+<body onload="time()" class="app sidebar-mini rtl">
+<!-- Navbar-->
+<div th:replace="~{navbar-layout :: navbar-admin}"></div>
+<main class="app-content">
+    <div class="app-title">
+        <ul class="app-breadcrumb breadcrumb side">
+            <li class="breadcrumb-item active"><a href="#"><b>Danh sách đơn hàng</b></a></li>
+        </ul>
+        <div id="clock"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tile">
+                <div class="tile-body">
+                    <div class="row element-button">
+                        <div class="col-sm-2">
+                            <a class="btn btn-delete btn-sm" type="button" title="Xóa" onclick="deleteOrders()"><i
+                                    class="fas fa-trash-alt"></i> Xóa tất cả </a>
+                        </div>
+                    </div>
+                    <div
+                            id="sampleTable_wrapper"
+                            class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer"
+                    >
+                        <div class="row">
+                            <div class="col-sm-12 col-md-6">
+                                <div class="dataTables_length" id="sampleTable_length">
+                                    <button name="sampleTable_length"
+                                            aria-controls="sampleTable"
+                                            class="form-control form-control-sm"
+                                            onclick="window.location='/manage-order/listOrder'"
+                                            style="width: fit-content"
+                                    >Tất cả
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-12 col-md-6">
+                                <div id="sampleTable_filter" class="dataTables_filter">
+                                    <form action="/manage-order/search" method="post">
+                                        <label>
+                                            <input type="date"
+                                                   name="date"
+                                                   th:value="${date}"
+                                                   class="form-control form-control-sm"
+                                                   aria-controls="sampleTable"/>
+                                            <input id="search"
+                                                   type="search"
+                                                   name="name"
+                                                   th:value="${name}"
+                                                   class="form-control form-control-sm"
+                                                   placeholder="Nhập tên khách hàng"
+                                                   aria-controls="sampleTable"/>
+                                            <input type="submit" value="Tìm kiếm"/>
+                                        </label>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <form id="form" action="/manage-order/deleteOrders" method="post">
+                                    <table class="table table-hover table-bordered" id="sampleTable">
+                                        <thead>
+                                        <tr>
+                                            <th width="10"><input type="checkbox" id="all" onchange="checkAll()"></th>
+                                            <th>ID đơn hàng</th>
+                                            <th>Khách hàng</th>
+                                            <th>Tên người nhận</th>
+                                            <th>Địa chỉ nhận</th>
+                                            <th>Số điện thoại</th>
+                                            <th>Email nhận</th>
+                                            <th>Ngày đặt hàng</th>
+                                            <th>Tổng tiền</th>
+                                            <th>Tình trạng</th>
+                                            <th>Chức năng</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:if="${listOrder.isEmpty()}">
+                                            <td id="Notfound" colspan="10">Không có đơn hàng nào</td>
+                                        </tr>
+                                        <tr th:each="order : ${listOrder}">
+                                            <td width="10"><input type="checkbox" name="orderId" th:value="${order.id}">
+                                            </td>
+                                            <td th:text="${order.id}"></td>
+                                            <td th:text="${order.getUser().getLastname()}"></td>
+                                            <td th:text="${order.nameReceiver}"></td>
+                                            <td th:text="${order.addressReceiver}"></td>
+                                            <td th:text="${order.phoneReceiver}"></td>
+                                            <td th:text="${order.emailReceiver}"></td>
+                                            <td th:text="${order.formatDate()}"></td>
+                                            <td th:text="${order.formatPrice()}"></td>
+                                            <td><span class="badge bg-success"
+                                                      th:if="${order.status.equals('Đã hoàn thành')}"
+                                                      th:text="${order.status}"></span>
+                                                <span class="badge bg-warning"
+                                                      th:if="${order.status.equals('Đang vận chuyển')}"
+                                                      th:text="${order.status}"></span>
+                                                <span class="badge bg-info" th:if="${order.status.equals('Chờ xử lý')}"
+                                                      th:text="${order.status}"></span>
+                                                <span class="badge bg-danger" th:if="${order.status.equals('Đã hủy')}"
+                                                      th:text="${order.status}"></span>
+                                                <span class="badge bg-secondary" th:if="${order.status.equals('Đã thanh toán')}"
+                                                      th:text="${order.status}"></span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-primary btn-sm badge-info" type="button"
+                                                        title="Xem chi tiết"
+                                                        th:onclick="|window.location='/manage-order/detail/' + ${order.id}|">
+                                                    Xem chi tiết
+                                                </button>
+                                                <button class="btn btn-primary btn-sm trash" type="button" title="Xóa"
+                                                        th:onclick="|deleteOrder(${order.id})|"><i
+                                                        class="fas fa-trash-alt"></i></button>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<!-- Essential javascripts for application to work-->
+<script src="/js/jquery-3.2.1.min.js"></script>
+<script src="/js/popper.min.js"></script>
+<script src="/js/bootstrapSA.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="/js/mainSA.js"></script>
+<!-- The javascript plugin to display page loading on top-->
+<script src="/js/plugins/pace.min.js"></script>
+<!-- Page specific javascripts-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+<!-- Data table plugin-->
+<script type="text/javascript">$('#sampleTable').DataTable();</script>
+<script>
+    function deleteOrder(orderId) {
+        swal({
+            title: "Cảnh báo",
+
+            text: "Bạn có chắc chắn là muốn xóa đơn hàng này?",
+            buttons: ["Hủy bỏ", "Đồng ý"],
+        })
+            .then((willDelete) => {
+                if (willDelete) {
+                    window.location = '/manage-order/delete/' + orderId;
+                    swal("Đã xóa thành công.!", {});
+                }
+            });
+    }
+
+
+    function deleteOrders() {
+        var selectedUsers = [];
+        document.querySelectorAll('input[name="orderId"]:checked').forEach(function (checkbox) {
+            selectedUsers.push(checkbox.value);
+        });
+
+        if (selectedUsers.length === 0) {
+            swal("Chưa chọn đơn hàng", "Vui lòng chọn ít nhất một đơn hàng để xóa.", "warning");
+        }
+        else {
+            swal({
+                title: "Cảnh báo",
+
+                text: "Bạn có chắc chắn là muốn xóa các đơn hàng đã chọn?",
+                buttons: ["Hủy bỏ", "Đồng ý"],
+            })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        document.getElementById('form').submit();
+                        swal("Đã xóa thành công.!", {});
+                    }
+                });
+        }
+    }
+
+    function checkAll() {
+        if(document.getElementById('all').checked){
+            document.querySelectorAll('input[name="orderId"]').forEach(function (checkbox) {
+                checkbox.checked = true;
+            });
+        }
+        else{
+            document.querySelectorAll('input[name="orderId"]').forEach(function (checkbox) {
+                checkbox.checked = false;
+            });
+        }
+
+    }
+    //Modal
+    $("#show-emp").on("click", function () {
+        $("#ModalUP").modal({backdrop: false, keyboard: false})
+    });
+
+</script>
+</body>
+
+</html>

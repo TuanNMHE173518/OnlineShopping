@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/LineIcons.3.0.css" />
+    <link rel="stylesheet" href="/css/tiny-slider.css" />
+    <link rel="stylesheet" href="/css/glightbox.min.css" />
+    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="webjars/font-awesome/6.5.1/css/all.min.css"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+    <script src="https://esgoo.net/scripts/jquery.js"></script>
+    <style type="text/css">
+        .css_select_div{ text-align: center;}
+        .css_select{ display: inline-table; width: 25%; padding: 5px; margin: 5px 2%; border: solid 1px #686868; border-radius: 5px;}
+    </style>
+    <script>
+        $(document).ready(function() {
+            //Lấy tỉnh thành
+            $.getJSON('https://esgoo.net/api-tinhthanh/1/0.htm',function(data_tinh){
+                if(data_tinh.error==0){
+                    $.each(data_tinh.data, function (key_tinh,val_tinh) {
+                        $("#tinh").append('<option id="'+val_tinh.id+'" value="'+val_tinh.full_name+'">'+val_tinh.full_name+'</option>');
+                    });
+                    $("#tinh").change(function(e){
+                        var idtinh=$(this).find('option:selected').attr('id');
+                        //Lấy quận huyện
+                        $.getJSON('https://esgoo.net/api-tinhthanh/2/'+idtinh+'.htm',function(data_quan){
+                            if(data_quan.error==0){
+                                $("#quan").html('<option value="0">Quận Huyện</option>');
+                                $("#phuong").html('<option value="0">Phường Xã</option>');
+                                $.each(data_quan.data, function (key_quan,val_quan) {
+                                    $("#quan").append('<option id="'+val_quan.id+'" value="'+val_quan.full_name+'">'+val_quan.full_name+'</option>');
+                                });
+
+                                $("#quan").change(function(e){
+                                    var idquan=$(this).find('option:selected').attr('id');
+                                    $.getJSON('https://esgoo.net/api-tinhthanh/3/'+idquan+'.htm',function(data_phuong){
+                                        if(data_phuong.error==0){
+                                            $("#phuong").html('<option value="0">Phường Xã</option>');
+                                            $.each(data_phuong.data, function (key_phuong,val_phuong) {
+                                                $("#phuong").append('<option id="'+val_phuong.id+'" value="'+val_phuong.full_name+'">'+val_phuong.full_name+'</option>');
+                                            });
+                                        }
+                                    });
+                                });
+
+                            }
+                        });
+                    });
+
+                }
+            });
+        });
+    </script>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef2f5;
+            margin: 0;
+
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .edit-container {
+            max-width: 700px;
+            width: 100%;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .profile-wrap{
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .edit-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .edit-header h1 {
+            margin: 0;
+            font-size: 28px;
+            color: #333;
+        }
+        .edit-form {
+            display: flex;
+            flex-direction: column;
+        }
+        .edit-form label {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 5px;
+        }
+        .edit-form input {
+            margin-bottom: 15px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .edit-form button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .edit-form button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<header class="header navbar-area">
+    <!-- Start Topbar -->
+    <div class="topbar">
+        <div class="container">
+            <div class="row align-items-center" style="
+                        border-right-width: 0px;
+                        margin-left: 150px">
+                <div class="col-lg-9 col-md-9 col-12">
+                    <div class="top-middle">
+                        <ul class="useful-links">
+                            <li><a th:href="@{/home}">Home</a></li>
+                            <li><a th:href="@{/about-us}">About Us</a></li>
+                            <li><a th:href="@{/contact}">Contact Us</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-12">
+                    <div class="top-end">
+
+                        <div class="user parent">
+                            <i class="lni lni-user"></i>
+                            <ul class="sub-menu child" id="submenu-1-9">
+                                <li class="nav-item"><a th:href="@{/profile}">Thông Tin Tài Khoản</a></li>
+                                <li class="nav-item"><a th:href="@{/profile/edit}">Thay Đổi Hồ Sơ</a></li>
+                                <li class="nav-item"><a th:href="@{/profile/changePassword}">Đổi Mật Khẩu</a></li>
+                            </ul>
+                        </div>
+
+                        <ul class="user-login">
+                            <li  sec:authorize="isAnonymous()">
+                                <a th:href="@{/login}">Đăng Nhập</a>
+                            </li>
+                            <li sec:authorize="isAnonymous()">
+                                <a th:href="@{/register}">Đăng Ký </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Topbar -->
+</header>
+<div class="profile-wrap">
+    <div class="edit-container">
+        <div class="edit-header">
+            <h1>Thay Đổi Thông Tin Cá Nhân</h1>
+        </div>
+        <form class="edit-form" th:action="@{/profile/edit}" th:object="${user}" method="post">
+            <input type="hidden" th:field="*{id}" />
+
+            <label>Họ và tên đệm:</label>
+            <input type="text" th:field="*{firstname}" />
+            <span th:if="${#fields.hasErrors('firstname')}" th:errors="*{firstname}"></span>
+            <label>Tên:</label>
+            <input type="text" th:field="*{lastname}" />
+            <span th:if="${#fields.hasErrors('lastname')}" th:errors="*{lastname}"></span>
+            <label>Giới Tính:</label><br>
+            <label><input type="radio" th:field="*{gender}" value="true"/> Nam</label>
+            <label><input type="radio" th:field="*{gender}" value="false" />Nữ</label>
+
+            <label>Email:</label>
+            <input type="email" th:field="*{email}" />
+            <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+            <label>Số điện thoại:</label>
+            <input type="text" th:field="*{phone}" />
+            <span th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></span>
+            <label>Địa Chỉ Nhà:</label>
+            <input type="text" th:field="*{address}" />
+            <span th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></span>
+            <select class="css_select" id="tinh" name="tinh" title="Chọn Tỉnh Thành">
+                <option value="0">Tỉnh Thành</option>
+            </select>
+            <select class="css_select" id="quan" name="quan" title="Chọn Quận Huyện">
+                <option value="0">Quận Huyện</option>
+            </select>
+            <select class="css_select" id="phuong" name="phuong" title="Chọn Phường Xã">
+                <option value="0">Phường Xã</option>
+            </select>
+
+
+            <button type="submit">Lưu</button>
+        </form>
+    </div>
+</div>
+
+<footer class="footer">
+    <!-- Start Footer Middle -->
+    <div class="footer-middle">
+        <div class="container">
+            <div class="bottom-inner">
+                <div class="row">
+                    <div class="col-lg-4 col-md-6 col-12">
+                        <!-- Single Widget -->
+                        <div class="single-footer f-contact">
+                            <h3>Get In Touch With Us</h3>
+                            <p class="phone">Phone: +1 (900) 33 169 7720</p>
+                            <ul>
+                                <li><span>Monday-Friday: </span> 9.00 am - 8.00 pm</li>
+                                <li><span>Saturday: </span> 10.00 am - 6.00 pm</li>
+                            </ul>
+                            <p class="mail">
+                                <a href="mailto:support@shopgrids.com">support@itechheaven.com</a>
+                            </p>
+                        </div>
+                        <!-- End Single Widget -->
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-12">
+                        <!-- Single Widget -->
+                        <div class="single-footer f-link">
+                            <h3>Information</h3>
+                            <ul>
+                                <li><a href="javascript:void(0)">About Us</a></li>
+                                <li><a href="javascript:void(0)">Contact Us</a></li>
+                            </ul>
+                        </div>
+                        <!-- End Single Widget -->
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-12">
+                        <!-- Single Widget -->
+                        <div class="single-footer f-link">
+                            <h3>Shop Departments</h3>
+                            <ul>
+                                <li><a href="javascript:void(0)">Apple</a></li>
+                                <li><a href="javascript:void(0)">Ipad</a></li>
+                                <li><a href="javascript:void(0)">Apple Watch</a></li>
+                                <li><a href="javascript:void(0)">Mac</a></li>
+                            </ul>
+                        </div>
+                        <!-- End Single Widget -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Footer Middle -->
+</footer>
+</body>
+</html>
